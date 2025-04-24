@@ -3,7 +3,7 @@ import hashlib
 
 from jose import JWTError, jwt
 from fastapi import Request, HTTPException
-from app.users.service import UserService
+from web_app.users.service import UserService
 from base.constant import *
 
 
