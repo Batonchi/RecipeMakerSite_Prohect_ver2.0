@@ -10,7 +10,7 @@ app = Flask(__name__)
 
 # Конфигурация (лучше вынести в отдельный config.py)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key')
-API_KEY = os.getenv('BOT_API_KEY')  # Ключ для вашего бота
+API_KEY = os.getenv('BOT_API_KEY')
 
 
 class ChatBot:

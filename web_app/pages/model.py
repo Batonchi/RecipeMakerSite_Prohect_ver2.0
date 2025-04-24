@@ -15,3 +15,6 @@ class Images(Base):
 
     image_id = Column(Integer, primary_key=True, autoincrement=True)
     url = Column(String, default='')
+
+
+
