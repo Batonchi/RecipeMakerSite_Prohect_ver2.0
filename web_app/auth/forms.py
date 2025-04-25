@@ -6,17 +6,17 @@ from base.service import BaseService
 
 
 class LoginForm(BaseService, FlaskForm):
-    email = EmailField('Email', validators=[DataRequired()])
-    password = PasswordField('password', validators=[DataRequired()])
-    remember_me = BooleanField('Remember me')
-    submit = SubmitField('Sign In')
+    email = EmailField('Почта', validators=[DataRequired()])
+    password = PasswordField('Пароль', validators=[DataRequired()])
+    remember_me = BooleanField('Запомнить меня')
+    submit = SubmitField('Войти')
 
 
 class RegisterForm(BaseService, FlaskForm):
-    name = StringField('Name', validators=[DataRequired()])
-    surname = StringField('Surname', validators=[DataRequired()])
-    date_of_birth = DateField('Date of birth', validators=[DataRequired()])
-    email = EmailField('Email', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    password_again = PasswordField('Repeat password', validators=[DataRequired()])
-    submit = SubmitField('Sign Up')
+    name = StringField('Имя', validators=[DataRequired()])
+    surname = StringField('Фамилия', validators=[DataRequired()])
+    date_of_birth = DateField('Дата рождения', validators=[DataRequired()])
+    email = EmailField('Почта', validators=[DataRequired()])
+    password = PasswordField('Пароль', validators=[DataRequired()])
+    password_again = PasswordField('Повторите пароль', validators=[DataRequired()])
+    submit = SubmitField('Зарегистрироваться')

@@ -7,8 +7,7 @@ from alembic import context
 
 from base.database import Base, metadata
 from base.constant import PORT, HOST, DBNAME, PASSWORD, USER
-from web_app.users.model import User
-from web_app.admin.model import Admin
+from web_app.users.model import User, UserToken
 from web_app.pages.model import Pages, Images
 from web_app.recipes.model import Recipe
 

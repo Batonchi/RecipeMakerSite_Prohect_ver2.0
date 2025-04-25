@@ -3,4 +3,7 @@ from base.service import BaseService
 
 
 class UserService(BaseService):
-    pass
+    model = User
+    # @classmethod
+    # def __init__(cls):
+    #     super().__init__()

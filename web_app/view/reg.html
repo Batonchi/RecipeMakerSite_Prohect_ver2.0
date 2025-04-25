@@ -1,7 +1,7 @@
 {% extends "test.html" %}
 
 {% block content %}
-<h1>Sign Up</h1>
+<h1>Регистрация</h1>
 <form action="" method="post">
     {{ form.hidden_tag() }}
         <p>
@@ -22,6 +22,14 @@
             </p>
         {% endfor %}
     </p>
+    <p>
+        {{ form.date_of_birth.label }}<br>
+        {{ form.date_of_birth(class="form-control") }}<br>
+        {% for error in form.date_of_birth.errors %}
+            <p class="alert alert-danger" role="alert">
+                {{ error }}
+    </p>
+        {% endfor %}
     <p>
         {{ form.email.label }}<br>
         {{ form.email(class="form-control", type="email") }}<br>
