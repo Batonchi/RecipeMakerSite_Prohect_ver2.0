@@ -125,7 +125,7 @@ def chat_widget():
                 background: #e3f2fd;
                 margin-left: auto;
             }
-            .bot-message {
+            .bots-message {
                 background: #f1f1f1;
                 margin-right: auto;
             }
@@ -148,7 +148,7 @@ def chat_widget():
 
             function addMessage(text, isUser) {
                 const messageDiv = document.createElement('div');
-                messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+                messageDiv.className = `message ${isUser ? 'user-message' : 'bots-message'}`;
                 messageDiv.textContent = text;
                 chatBody.appendChild(messageDiv);
                 chatBody.scrollTop = chatBody.scrollHeight;
