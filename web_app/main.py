@@ -18,8 +18,21 @@ app.secret_key = SECRET_KEY
 # app.register_blueprint(auth_router)
 
 
+
+
 @app.route('/')
 def main_page():
+    try:
+        print("Sending test email...")
+        response = requests.get(
+            'http://localhost:8000/support_mail//delete_all_emails/pop3',
+            timeout=10
+        )
+        result = response.json()
+        print(result)
+        return 'DONE'
+    except Exception as e:
+        return f"Error: {str(e)}", 500
     return 'hi'
 
 

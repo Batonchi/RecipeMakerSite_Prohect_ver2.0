@@ -1,14 +1,18 @@
-# from base.mail import BaseMailClient
-# from base.constant import MAIL_USERNAME, MAIL_PASSWORD
-#
-#
-# class MailClient(BaseMailClient):
-#
-#     def __init__(self):
-#         BaseMailClient.__init__(self, **{'USERNAME': MAIL_USERNAME,
-#                                          'PASSWORD': MAIL_PASSWORD,
-#                                          'SERVER': 'smtp.mail.ru',
-#                                          'PORT': 465,
-#                                          'USE_TLS': False,
-#                                          'USE_SSL': True
-#                                          })
+from typing import Tuple
+
+from base.mail import BaseSMPTMailClient
+from base.constant import MAIL_USERNAME, NOTIFICATION_MAIL_PASSWORD
+
+
+notification_client = BaseSMPTMailClient(**{
+    'USERNAME': MAIL_USERNAME,
+    'PASSWORD': NOTIFICATION_MAIL_PASSWORD
+})
+notification_mail_app = notification_client.get_app()
+
+
+@notification_mail_app.route('/send_email/<user_id>', methods=['POST'])
+def send_notification_email(to: str | list, body: Tuple[str, str], subject: str = 'Оповещение'):
+    return notification_client.send_mail(to, body, subject)
+
+        
