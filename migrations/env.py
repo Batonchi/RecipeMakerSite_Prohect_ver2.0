@@ -10,6 +10,7 @@ from base.constant import PORT, HOST, DBNAME, PASSWORD, USER
 from web_app.users.model import User, UserToken
 from web_app.pages.model import Pages, Images
 from web_app.recipes.model import Recipe
+from bots.model import AIResponseData
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

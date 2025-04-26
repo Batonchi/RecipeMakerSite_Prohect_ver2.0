@@ -8,6 +8,7 @@ from base.database import async_session_maker
 from web_app.auth.service import hash_password, create_token
 from web_app.auth.forms import LoginForm, RegisterForm
 from dotenv import load_dotenv
+# from web_app.auth.router import router as auth_router
 from web_app.auth.router import router as auth_router
 import os
 
