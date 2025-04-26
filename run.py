@@ -6,12 +6,14 @@ from starlette.routing import Mount, Route
 from starlette.middleware.wsgi import WSGIMiddleware
 from starlette.responses import RedirectResponse
 from asgiref.wsgi import WsgiToAsgi
+from web_app.notification.notification_mail import notification_mail_app
 from base.constant import PORT, HOST
 
 
 web_app_asgi = WSGIMiddleware(web_app)
 bot_app_asgi = WSGIMiddleware(bot_app)
 mail_app_asgi = WSGIMiddleware(mail_app)
+notification_mail_app_asgi = WSGIMiddleware(notification_mail_app)
 
 
 async def homepage(request):
@@ -23,7 +25,8 @@ app = Starlette(
         Route("/", homepage),
         Mount("/recipe", web_app_asgi),
         Mount("/generate_image", bot_app_asgi),
-        Mount("/support/mail", mail_app_asgi),
+        Mount("/support_mail", mail_app_asgi),
+        Mount("/notification_mail", notification_mail_app_asgi),
     ]
 )
 
