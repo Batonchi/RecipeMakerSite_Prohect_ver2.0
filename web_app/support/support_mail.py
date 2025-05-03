@@ -27,10 +27,8 @@ def get_email_with_pop():
                                mail_app.config['POP3_PORT'])
         mail.user(mail_app.config['MAIL_USERNAME'])
         mail.pass_(mail_app.config['MAIL_PASSWORD'])
-
         l_mails = len(mail.list()[1])
         emails = []
-
         for i in range(1, l_mails + 1):
             bytes_null, msg_lines, int_null = mail.retr(i)
             msg_content = b'\n'.join(msg_lines).decode('utf-8')
