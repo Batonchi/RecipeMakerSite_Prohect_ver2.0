@@ -1,0 +1,290 @@
+{% extends "test.html" %}
+
+{% block content %}
+    <h1>Создать новый рецепт</h1>
+    <form action="" method="post" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+
+        <div class="form-group">
+            {{ form.name.label }}<br>
+            {{ form.name(class="form-control") }}
+            {% for error in form.name.errors %}
+                <div class="alert alert-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            {{ form.theme.label }}<br>
+            {{ form.theme(class="form-control") }}
+            {% for error in form.theme.errors %}
+                <div class="alert alert-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            {{ form.description.label }}<br>
+            {{ form.description(class="form-control") }}
+            {% for error in form.description.errors %}
+                <div class="alert alert-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            {{ form.hashtags.label }}<br>
+            {{ form.hashtags(class="form-control") }}
+            {% for error in form.hashtags.errors %}
+                <div class="alert alert-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            {{ form.categories.label }}<br>
+            {{ form.categories(class="form-control") }}
+            {% for error in form.categories.errors %}
+                <div class="alert alert-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <h2>Ингредиенты</h2>
+        <div id="ingredients-list">
+            {% for ingredient in form.ingredients %}
+                <div class="ingredient-form">
+                    {{ ingredient.form.hidden_tag() }}
+                    <div class="form-row">
+                        <div class="form-group col-md-2">
+                            {{ ingredient.form.number.label }}
+                            {{ ingredient.form.number(class="form-control") }}
+                            {% for error in ingredient.form.number.errors %}
+                                <div class="alert alert-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="form-group col-md-4">
+                            {{ ingredient.form.name.label }}
+                            {{ ingredient.form.name(class="form-control") }}
+                            {% for error in ingredient.form.name.errors %}
+                                <div class="alert alert-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="form-group col-md-3">
+                            {{ ingredient.form.purpose.label }}
+                            {{ ingredient.form.purpose(class="form-control") }}
+                            {% for error in ingredient.form.purpose.errors %}
+                                <div class="alert alert-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="form-group col-md-3">
+                            {{ ingredient.form.quantity.label }}
+                            {{ ingredient.form.quantity(class="form-control") }}
+                            {% for error in ingredient.form.quantity.errors %}
+                                <div class="alert alert-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <button type="button" class="btn btn-secondary" id="add-ingredient">Добавить ингредиент</button>
+
+        <h2>Этапы</h2>
+        <div id="steps-list">
+            {% for step in form.steps %}
+                <div class="step-form">
+                    {{ step.form.hidden_tag() }}
+                    <div class="form-row">
+                         <div class="form-group col-md-2">
+                            {{ step.form.number.label }}
+                            {{ step.form.number(class="form-control") }}
+                            {% for error in step.form.number.errors %}
+                                <div class="alert alert-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="form-group col-md-10">
+                            {{ step.form.name.label }}
+                            {{ step.form.name(class="form-control") }}
+                            {% for error in step.form.name.errors %}
+                                <div class="alert alert-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ step.form.description.label }}
+                        {{ step.form.description(class="form-control") }}
+                        {% for error in step.form.description.errors %}
+                            <div class="alert alert-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                     <div class="form-group">
+                        {{ step.form.explanation.label }}
+                        {{ step.form.explanation(class="form-control") }}
+                        {% for error in step.form.explanation.errors %}
+                            <div class="alert alert-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group">
+                        {{ step.form.image_url.label }}
+                        {{ step.form.image_url(class="form-control") }}
+                         {% for error in step.form.image_url.errors %}
+                            <div class="alert alert-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                     <div class="form-row">
+                        <div class="form-group col-md-6">
+                            {{ step.form.link.label }}
+                            {{ step.form.link(class="form-control") }}
+                            {% for error in step.form.link.errors %}
+                                <div class="alert alert-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="form-group col-md-6">
+                            {{ step.form.link_description.label }}
+                            {{ step.form.link_description(class="form-control") }}
+                            {% for error in step.form.link_description.errors %}
+                                <div class="alert alert-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <button type="button" class="btn btn-secondary" id="add-step">Добавить этап</button>
+
+        <h2>Результат</h2>
+        <div class="form-group">
+            {{ form.result.label }}<br>
+            {{ form.result(class="form-control") }}
+            {% for error in form.result.errors %}
+                <div class="alert alert-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                {{ form.result_link.label }}
+                {{ form.result_link(class="form-control") }}
+                 {% for error in form.result_link.errors %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endfor %}
+            </div>
+            <div class="form-group col-md-6">
+                {{ form.result_link_description.label }}
+                {{ form.result_link_description(class="form-control") }}
+                 {% for error in form.result_link_description.errors %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endfor %}
+            </div>
+        </div>
+
+
+        <div class="form-group form-check">
+            {{ form.use_ai_image(class="form-check-input") }}
+            {{ form.use_ai_image.label(class="form-check-label") }}
+        </div>
+
+        <div class="form-group form-check">
+            {{ form.use_ai_text(class="form-check-input") }}
+            {{ form.use_ai_text.label(class="form-check-label") }}
+        </div>
+
+        <p>
+            {{ form.submit(class="btn btn-primary", value="Создать") }}
+            {{ form.cancel(class="btn btn-secondary", value="Отменить") }}
+        </p>
+    </form>
+
+    <script>
+        // JavaScript для добавления новых полей ингредиентов
+        document.getElementById('add-ingredient').addEventListener('click', function() {
+            const list = document.getElementById('ingredients-list');
+            const newIndex = list.children.length;
+            const template = `
+                <div class="ingredient-form">
+                    <input type="hidden" name="ingredients-${newIndex}-csrf_token" value="{{ csrf_token() }}">
+                    <div class="form-row">
+                        <div class="form-group col-md-2">
+                            <label for="ingredients-${newIndex}-number">Номер ингредиента</label>
+                            <input class="form-control" id="ingredients-${newIndex}-number" name="ingredients-${newIndex}-number" required type="number" value="${newIndex + 1}">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="ingredients-${newIndex}-name">Название ингредиента</label>
+                            <input class="form-control" id="ingredients-${newIndex}-name" name="ingredients-${newIndex}-name" required type="text" value="">
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="ingredients-${newIndex}-purpose">Для чего</label>
+                            <input class="form-control" id="ingredients-${newIndex}-purpose" name="ingredients-${newIndex}-purpose" type="text" value="">
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="ingredients-${newIndex}-quantity">Количество</label>
+                            <input class="form-control" id="ingredients-${newIndex}-quantity" name="ingredients-${newIndex}-quantity" required type="text" value="">
+                        </div>
+                    </div>
+                </div>
+            `;
+            list.insertAdjacentHTML('beforeend', template);
+        });
+
+        // JavaScript для добавления новых полей этапов
+        document.getElementById('add-step').addEventListener('click', function() {
+            const list = document.getElementById('steps-list');
+            const newIndex = list.children.length;
+            const template = `
+                <div class="step-form">
+                    <input type="hidden" name="steps-${newIndex}-csrf_token" value="{{ csrf_token() }}">
+                     <div class="form-row">
+                         <div class="form-group col-md-2">
+                            <label for="steps-${newIndex}-number">Номер этапа</label>
+                            <input class="form-control" id="steps-${newIndex}-number" name="steps-${newIndex}-number" required type="number" value="${newIndex + 1}">
+                        </div>
+                        <div class="form-group col-md-10">
+                            <label for="steps-${newIndex}-name">Имя этапа</label>
+                            <input class="form-control" id="steps-${newIndex}-name" name="steps-${newIndex}-name" required type="text" value="">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="steps-${newIndex}-description">Описание этапа</label>
+                        <textarea class="form-control" id="steps-${newIndex}-description" name="steps-${newIndex}-description" required></textarea>
+                    </div>
+                     <div class="form-group">
+                        <label for="steps-${newIndex}-explanation">Пояснения</label>
+                        <textarea class="form-control" id="steps-${newIndex}-explanation" name="steps-${newIndex}-explanation"></textarea>
+                    </div>
+                     <div class="form-group">
+                        <label for="steps-${newIndex}-image_url">URL изображения</label>
+                        <input class="form-control" id="steps-${newIndex}-image_url" name="steps-${newIndex}-image_url" type="text" value="">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="steps-${newIndex}-link">Ссылка</label>
+                            <input class="form-control" id="steps-${newIndex}-link" name="steps-${newIndex}-link" type="text" value="">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="steps-${newIndex}-link_description">Описание ссылки</label>
+                            <input class="form-control" id="steps-${newIndex}-link_description" name="steps-${newIndex}-link_description" type="text" value="">
+                        </div>
+                    </div>
+                </div>
+            `;
+            list.insertAdjacentHTML('beforeend', template);
+        });
+
+        // JavaScript для обработки кнопки "Отменить" (очистка полей)
+        document.querySelector('form').addEventListener('submit', function(event) {
+            const form = event.target;
+            const cancelButton = event.submitter; // Получаем кнопку, которая была нажата
+
+            if (cancelButton && cancelButton.getAttribute('name') === 'cancel') {
+                event.preventDefault(); // Отменяем стандартную отправку формы
+                form.reset(); // Очищаем все поля формы
+                // Возможно, потребуется дополнительная логика для удаления динамически добавленных полей,
+                // если их больше минимального количества.
+                // Например:
+                // const ingredientsList = document.getElementById('ingredients-list');
+                // while (ingredientsList.children.length > 1) {
+                //     ingredientsList.removeChild(ingredientsList.lastChild);
+                // }
+                // const stepsList = document.getElementById('steps-list');
+                // while (stepsList.children.length > 1) {
+                //     stepsList.removeChild(stepsList.lastChild);
+                // }
+            }
+        });
+    </script>
+{% endblock %}
