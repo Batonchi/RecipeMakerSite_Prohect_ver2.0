@@ -2,9 +2,10 @@ import hashlib
 
 
 from jose import JWTError, jwt
-from fastapi import Request, HTTPException
+from starlette.exceptions import HTTPException
 from web_app.users.service import UserService
 from base.constant import *
+from flask import request
 
 
 def create_token(email: str, password: str):
@@ -18,7 +19,7 @@ def hash_password(password: str):
     return alg.hexdigest()
 
 
-async def get_user_by_token(request: Request):
+async def get_user_by_token():
     token = request.cookies.get('token')
     if not token:
         raise HTTPException(status_code=409, detail="Пожалуйста войдите в аккаунт!")
@@ -32,8 +33,8 @@ async def get_user_by_token(request: Request):
     return user
 
 
-async def get_admin_by_token(request: Request):
-    user = await get_user_by_token(request)
+async def get_admin_by_token():
+    user = await get_user_by_token()
     if not user.is_admin:
         raise HTTPException(status_code=403, detail="У вас нет доступа!")
     return user

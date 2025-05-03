@@ -1,35 +1,30 @@
+from flask_restful import Api, Resource
+from flask import redirect, Flask
+from web_app.support.support_mail import mail_app
+from web_app.notification.notification_mail import notification_mail_app
 from web_app.main import app as web_app
 from bots.main import app as bot_app
-from starlette.applications import Starlette
-from web_app.support.support_mail import mail_app
-from starlette.routing import Mount, Route
-from starlette.middleware.wsgi import WSGIMiddleware
-from starlette.responses import RedirectResponse
-from asgiref.wsgi import WsgiToAsgi
-from web_app.notification.notification_mail import notification_mail_app
-from base.constant import PORT, HOST
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 
-web_app_asgi = WSGIMiddleware(web_app)
-bot_app_asgi = WSGIMiddleware(bot_app)
-mail_app_asgi = WSGIMiddleware(mail_app)
-notification_mail_app_asgi = WSGIMiddleware(notification_mail_app)
+app = Flask(__name__)
+api = Api(app)
 
 
-async def homepage(request):
-    return RedirectResponse('/recipe')
+class HomePage(Resource):
+    def get(self):
+        return redirect('/recipe')
 
 
-app = Starlette(
-    routes=[
-        Route("/", homepage),
-        Mount("/recipe", web_app_asgi),
-        Mount("/generate_image", bot_app_asgi),
-        Mount("/support_mail", mail_app_asgi),
-        Mount("/notification_mail", notification_mail_app_asgi),
-    ]
-)
+api.add_resource(HomePage, '/')
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host=HOST, port=8000)
+
+app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
+    '/recipe': web_app,
+    '/support/mail': mail_app,
+    '/notification/mail': notification_mail_app,
+    '/work_with_text_bot': bot_app
+})
+
+if __name__ == '__main__':
+    app.run(debug=True)
