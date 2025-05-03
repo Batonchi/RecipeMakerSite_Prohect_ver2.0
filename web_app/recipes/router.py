@@ -3,7 +3,7 @@ from web_app.recipes.forms import RecipeForm
 from web_app.recipes.service import RecipeService
 from base.database import async_session_maker
 
-router = Blueprint('recipe', __name__,
+router = Blueprint('recipes', __name__,
                    url_prefix='/recipe',
                    static_folder='..web_app/view/static',
                    template_folder='..web_app/view/')
@@ -11,6 +11,7 @@ router = Blueprint('recipe', __name__,
 
 @router.get('/create')
 def create_recipe_page():
+    print('IN')
     return render_template('recipe.html', form=RecipeForm())
 
 

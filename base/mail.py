@@ -1,7 +1,7 @@
 from flask import render_template, jsonify, Response
 from flask_mail import Mail, Message
 from flask import Flask
-from typing import Tuple
+from typing import Tuple, Union
 
 
 class ServerMailVariants:
@@ -25,8 +25,8 @@ class MailClient:
     def get_app(self):
         return self.mail_app
 
-    def send_mail(self, to: str | list, body: Tuple[str, str], subject: str = 'Оповещение') -> (Response |
-                                                                                                tuple[Response, int]):
+    def send_mail(self, to: Union[str, list], body: Tuple[str, str], subject: str = 'Оповещение')\
+            -> Union[Response, Tuple[Response, int]]:
         try:
             msg = Message(subject, sender=self.mail_app.config['USERNAME'],
                           recipients=([to] if isinstance(to, str) else list(map(str, to))))
@@ -77,7 +77,8 @@ class BaseImapPop3SmtpClient:
     def get_app(self):
         return self.mail_app
 
-    def send_mail(self, to: str | list, body: Tuple[str, str], subject: str = 'Оповещение') -> Tuple[Response, int]:
+    def send_mail(self, to: Union[str, list], body: Tuple[str, str], subject: str = 'Оповещение')\
+            -> Union[Response, Tuple[Response, int]]:
         try:
             msg = Message(
                 subject,
