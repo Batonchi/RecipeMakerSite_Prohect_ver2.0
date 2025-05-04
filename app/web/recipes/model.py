@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, Text, JSON
 from app.base.database import Base
 from sqlalchemy import Column, Integer, String, Text, JSON, ForeignKey
 from sqlalchemy.orm import relationship
-from base.database import Base
+from app.base.database import Base
 
 
 class Recipe(Base):
