@@ -1,14 +1,14 @@
 import flask
 from flask import Flask, render_template, request, redirect, make_response
-from starlette.exceptions import HTTPException
-from web_app.auth.forms import LoginForm, RegisterForm
-from web_app.auth.service import create_token, hash_password
-from web_app.users.service import UserService
+from werkzeug.exceptions import HTTPException
+from app.web.auth.forms import LoginForm, RegisterForm
+from app.web.auth.service import create_token, hash_password
+from app.web.users.service import UserService
 
 router = flask.Blueprint('auth', __name__,
                          url_prefix='/auth',
-                         static_folder='..web_app/view/static',
-                         template_folder='..web_app/view/')
+                         static_folder='..web/view/static',
+                         template_folder='..web/view/')
 
 
 @router.get('/login')

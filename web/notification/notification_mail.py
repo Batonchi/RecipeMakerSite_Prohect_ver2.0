@@ -1,7 +1,7 @@
 from typing import Tuple
 
-from base.mail import BaseSMPTMailClient
-from base.constant import MAIL_USERNAME, NOTIFICATION_MAIL_PASSWORD
+from app.base.mail import BaseSMPTMailClient
+from app.base.constant import MAIL_USERNAME, NOTIFICATION_MAIL_PASSWORD
 
 
 notification_client = BaseSMPTMailClient(**{

@@ -1,7 +1,7 @@
-from bots.model import (AIResponse,
-                        AIRequest, AIResponseData, BaseAIClient, AIModelProvider)
+from app.bots.model import (AIResponse,
+                            AIRequest, AIResponseData, BaseAIClient, AIModelProvider)
 from typing import Optional, Dict, Union
-from base.service import BaseService
+from app.base.service import BaseService
 
 
 class AIService:

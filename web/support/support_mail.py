@@ -4,8 +4,8 @@ import poplib
 from typing import Tuple
 
 from flask_mail import Message, Mail
-from base.mail import BaseImapPop3SmtpClient
-from base.constant import SUPPORT_MAIL_PASSWORD, MAIL_USERNAME
+from app.base.mail import BaseImapPop3SmtpClient
+from app.base.constant import SUPPORT_MAIL_PASSWORD, MAIL_USERNAME
 from flask import jsonify, request
 
 complex_client = BaseImapPop3SmtpClient(**{

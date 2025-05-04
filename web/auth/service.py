@@ -1,10 +1,9 @@
 import hashlib
 
-
 from jose import JWTError, jwt
-from starlette.exceptions import HTTPException
-from web_app.users.service import UserService
-from base.constant import *
+from werkzeug.exceptions import HTTPException
+from app.web.users.service import UserService
+from app.base.constant import *
 from flask import request
 
 

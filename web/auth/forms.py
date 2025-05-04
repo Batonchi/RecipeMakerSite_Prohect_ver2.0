@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 import flask_mail
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, EmailField, DateField
 from wtforms.validators import DataRequired
-from base.service import BaseService
+from app.base.service import BaseService
 
 
 class LoginForm(BaseService, FlaskForm):

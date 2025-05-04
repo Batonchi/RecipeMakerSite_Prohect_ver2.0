@@ -1,6 +1,6 @@
-from bots.service import AIService
-from bots.model import AIModelProvider, YandexGPTClient, AIRequest
-from base.constant import YANDEX_API_KEY, YANDEX_FOLDER_ID
+from app.bots.service import AIService
+from app.bots.model import AIModelProvider, YandexGPTClient, AIRequest
+from app.base.constant import YANDEX_API_KEY, YANDEX_FOLDER_ID
 
 if __name__ == "__main__":
     ai_service = AIService()

@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Text, JSON
-from base.database import Base
+from app.base.database import Base
 
 
 class Recipe(Base):

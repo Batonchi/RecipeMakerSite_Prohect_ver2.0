@@ -1,6 +1,6 @@
 from sqlalchemy.exc import NoResultFound
 
-from base.database import async_session_maker
+from app.base.database import async_session_maker
 from sqlalchemy import select, insert, delete, update
 
 

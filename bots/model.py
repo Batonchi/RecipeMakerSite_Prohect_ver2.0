@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean, JSON, DateTime, ForeignKey
-from base.database import Base
+from app.base.database import Base
 from datetime import datetime
 from pydantic import BaseModel
 from typing import Optional

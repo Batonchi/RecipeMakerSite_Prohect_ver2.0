@@ -1,4 +1,4 @@
-from base.constant import DATABASE_URL
+from app.base.constant import DATABASE_URL
 from sqlalchemy import MetaData
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
