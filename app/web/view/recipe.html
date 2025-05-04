@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Форма Рецепта</title>
+    <style>
+        /* Базовая стилизация, можете адаптировать под свой дизайн */
+        body {
+            font-family: sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        form {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2, h3 {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .form-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+         textarea {
+             min-height: 100px; /* Минимальная высота для текстовых полей */
+         }
+        select[multiple] {
+            min-height: 100px; /* Минимальная высота для множественного выбора */
+        }
+        input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        .checkbox-group label {
+            font-weight: normal;
+            display: inline-block;
+        }
+        button[type="submit"],
+        button[type="button"] { /* Добавляем стиль для кнопок "Добавить" */
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-right: 10px;
+        }
+        button[type="submit"]:hover,
+        button[type="button"]:hover {
+            background-color: #45a049;
+        }
+         button[name="cancel"] { /* Стиль для кнопки отмены */
+            background-color: #f44336;
+        }
+         button[name="cancel"]:hover {
+            background-color: #d32f2f;
+        }
+         .field-list-item {
+             margin-bottom: 20px;
+             padding: 15px;
+             border: 1px dashed #ccc;
+             border-radius: 5px;
+             background-color: #fff;
+         }
+         .field-list-item h4 {
+             margin-top: 0;
+             margin-bottom: 15px;
+             color: #555;
+         }
+         .add-button {
+             margin-top: 10px;
+         }
+    </style>
+</head>
+<body>
+
+    <form method="POST" enctype="multipart/form-data">
+        <h2>Форма Рецепта</h2>
+
+        <div class="form-section">
+            <h3>Основная информация</h3>
+            <div class="form-group">
+                <label for="name">Название рецепта:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="theme">О чем; тема:</label>
+                <textarea id="theme" name="theme" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Описание:</label>
+                <textarea id="description" name="description" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="hashtags">Хэштеги (#text):</label>
+                <textarea id="hashtags" name="hashtags" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="categories">Категория рецепта:</label>
+                <select id="categories" name="categories" multiple required>
+                    <option value="Шаблоны">Шаблоны</option>
+                    <option value="Алгоритмы">Алгоритмы</option>
+                    <option value="Инфографики">Инфографики</option>
+                    <option value="Кулинария">Кулинария</option>
+                    <option value="Чертежи">Чертежи</option>
+                    <option value="Другое">Другое</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-section" id="ingredients-section">
+            <h3>Ингредиенты</h3>
+            <!-- Здесь будут динамически добавляться поля ингредиентов -->
+            <div class="field-list-item">
+                <h4>Ингредиент 1</h4>
+                 <div class="form-group">
+                    <label for="ingredients-0-number">Номер:</label>
+                    <input type="number" id="ingredients-0-number" name="ingredients-0-number" required min="1">
+                </div>
+                <div class="form-group">
+                    <label for="ingredients-0-name">Название:</label>
+                    <input type="text" id="ingredients-0-name" name="ingredients-0-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="ingredients-0-for_what">Для чего:</label>
+                    <input type="text" id="ingredients-0-for_what" name="ingredients-0-for_what" maxlength="255">
+                </div>
+                <div class="form-group">
+                    <label for="ingredients-0-quantity">Количество:</label>
+                    <input type="number" id="ingredients-0-quantity" name="ingredients-0-quantity" required>
+                </div>
+            </div>
+             <!-- Кнопка для добавления нового ингредиента (потребуется JavaScript) -->
+            <button type="button" class="add-button" onclick="addIngredient()">Добавить ингредиент</button>
+        </div>
+
+        <div class="form-section" id="steps-section">
+            <h3>Этапы</h3>
+             <!-- Здесь будут динамически добавляться поля этапов -->
+            <div class="field-list-item">
+                <h4>Этап 1</h4>
+                <div class="form-group">
+                    <label for="steps-0-number">Номер:</label>
+                    <input type="number" id="steps-0-number" name="steps-0-number" required min="1">
+                </div>
+                <div class="form-group">
+                    <label for="steps-0-name">Название этапа:</label>
+                    <input type="text" id="steps-0-name" name="steps-0-name" required maxlength="255">
+                </div>
+                <div class="form-group">
+                    <label for="steps-0-description">Описание этапа:</label>
+                    <textarea id="steps-0-description" name="steps-0-description" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="steps-0-explanations">Пояснения:</label>
+                    <textarea id="steps-0-explanations" name="steps-0-explanations" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="steps-0-images">Картинки:</label>
+                    <input type="file" id="steps-0-images" name="steps-0-images" multiple>
+                </div>
+                <div class="form-group">
+                    <label for="steps-0-link">Ссылка:</label>
+                    <input type="text" id="steps-0-link" name="steps-0-link" required>
+                </div>
+                <div class="form-group">
+                    <label for="steps-0-link_description">Описание ссылки:</label>
+                    <input type="text" id="steps-0-link_description" name="steps-0-link_description" required>
+                </div>
+            </div>
+             <!-- Кнопка для добавления нового этапа (потребуется JavaScript) -->
+            <button type="button" class="add-button" onclick="addStep()">Добавить этап</button>
+        </div>
+
+        <div class="form-section">
+            <h3>Результат</h3>
+            <div class="form-group">
+                <label for="result">Результат:</label>
+                <textarea id="result" name="result" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="result_link">Ссылка на результат:</label>
+                <input type="text" id="result_link" name="result_link" required>
+            </div>
+
+            <div class="form-group">
+                <label for="result_link_description">Описание ссылки на результат:</label>
+                <input type="text" id="result_link_description" name="result_link_description" required>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>Настройки AI</h3>
+            <div class="form-group checkbox-group">
+                <input type="checkbox" id="use_ai_image" name="use_ai_image" required>
+                <label for="use_ai_image">Использовать нейросеть для генерации фото</label>
+            </div>
+
+            <div class="form-group checkbox-group">
+                <input type="checkbox" id="use_ai_text" name="use_ai_text" required>
+                <label for="use_ai_text">Использовать нейросети для проверки и улучшения текста</label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <button type="submit" name="cancel" value="cancel">Отменить</button>
+            <button type="submit" name="submit" value="submit">Создать</button>
+        </div>
+
+    </form>
+
+    <script>
+        // JavaScript для динамического добавления полей ингредиентов и этапов
+        let ingredientIndex = 1; // Начинаем с 1, так как первый элемент уже есть
+        let stepIndex = 1; // Начинаем с 1, так как первый элемент уже есть
+
+        function addIngredient() {
+            const container = document.getElementById('ingredients-section');
+            const newIngredientDiv = document.createElement('div');
+            newIngredientDiv.classList.add('field-list-item');
+            newIngredientDiv.innerHTML = `
+                <h4>Ингредиент ${ingredientIndex + 1}</h4>
+                 <div class="form-group">
+                    <label for="ingredients-${ingredientIndex}-number">Номер:</label>
+                    <input type="number" id="ingredients-${ingredientIndex}-number" name="ingredients-${ingredientIndex}-number" required min="1">
+                </div>
+                <div class="form-group">
+                    <label for="ingredients-${ingredientIndex}-name">Название:</label>
+                    <input type="text" id="ingredients-${ingredientIndex}-name" name="ingredients-${ingredientIndex}-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="ingredients-${ingredientIndex}-for_what">Для чего:</label>
+                    <input type="text" id="ingredients-${ingredientIndex}-for_what" name="ingredients-${ingredientIndex}-for_what" maxlength="255">
+                </div>
+                <div class="form-group">
+                    <label for="ingredients-${ingredientIndex}-quantity">Количество:</label>
+                    <input type="number" id="ingredients-${ingredientIndex}-quantity" name="ingredients-${ingredientIndex}-quantity" required>
+                </div>
+            `;
+            // Вставляем новый элемент перед кнопкой "Добавить ингредиент"
+            container.insertBefore(newIngredientDiv, container.querySelector('.add-button'));
+            ingredientIndex++;
+        }
+
+        function addStep() {
+            const container = document.getElementById('steps-section');
+            const newStepDiv = document.createElement('div');
+            newStepDiv.classList.add('field-list-item');
+            newStepDiv.innerHTML = `
+                <h4>Этап ${stepIndex + 1}</h4>
+                <div class="form-group">
+                    <label for="steps-${stepIndex}-number">Номер:</label>
+                    <input type="number" id="steps-${stepIndex}-number" name="steps-${stepIndex}-number" required min="1">
+                </div>
+                <div class="form-group">
+                    <label for="steps-${stepIndex}-name">Название этапа:</label>
+                    <input type="text" id="steps-${stepIndex}-name" name="steps-${stepIndex}-name" required maxlength="255">
+                </div>
+                <div class="form-group">
+                    <label for="steps-${stepIndex}-description">Описание этапа:</label>
+                    <textarea id="steps-${stepIndex}-description" name="steps-${stepIndex}-description" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="steps-${stepIndex}-explanations">Пояснения:</label>
+                    <textarea id="steps-${stepIndex}-explanations" name="steps-${stepIndex}-explanations" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="steps-${stepIndex}-images">Картинки:</label>
+                    <input type="file" id="steps-${stepIndex}-images" name="steps-${stepIndex}-images" multiple>
+                </div>
+                <div class="form-group">
+                    <label for="steps-${stepIndex}-link">Ссылка:</label>
+                    <input type="text" id="steps-${stepIndex}-link" name="steps-${stepIndex}-link" required>
+                </div>
+                <div class="form-group">
+                    <label for="steps-${stepIndex}-link_description">Описание ссылки:</label>
+                    <input type="text" id="steps-${stepIndex}-link_description" name="steps-${stepIndex}-link_description" required>
+                </div>
+            `;
+             // Вставляем новый элемент перед кнопкой "Добавить этап"
+            container.insertBefore(newStepDiv, container.querySelector('.add-button'));
+            stepIndex++;
+        }
+    </script>
+
+</body>
+</html>

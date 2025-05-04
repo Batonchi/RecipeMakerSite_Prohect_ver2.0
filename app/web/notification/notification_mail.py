@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Union
 
 from app.base.mail import BaseSMPTMailClient
 from app.base.constant import MAIL_USERNAME, NOTIFICATION_MAIL_PASSWORD
@@ -12,7 +12,7 @@ notification_mail_app = notification_client.get_app()
 
 
 @notification_mail_app.route('/send_email/<user_id>', methods=['POST'])
-def send_notification_email(to: str | list, body: Tuple[str, str], subject: str = 'Оповещение'):
+def send_notification_email(to: Union[str, list], body: Tuple[str, str], subject: str = 'Оповещение'):
     return notification_client.send_mail(to, body, subject)
 
-        
+
