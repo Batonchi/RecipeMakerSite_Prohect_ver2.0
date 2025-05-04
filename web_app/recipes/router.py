@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for
-from web_app.recipes.forms import RecipeForm
+from web_app.recipes.forms import RecipeForm, IngredientForm, StepForm
 from web_app.recipes.service import RecipeService
 from base.database import async_session_maker
 
@@ -9,15 +9,13 @@ router = Blueprint('recipes', __name__,
                    template_folder='..web_app/view/')
 
 
-@router.get('/create')
-def create_recipe_page():
-    print('IN')
-    return render_template('recipe.html', form=RecipeForm())
-
-
-@router.post('/create')
+@router.route('/create', methods=['POST', 'GET'])
 async def create_recipe():
     form = RecipeForm()
+    if request.method == 'GET':
+        print('in')
+        # Явно инициализируем FieldList с одним пустым экземпляром каждой вложенной формы
+        form = RecipeForm(ingredients=[IngredientForm()], steps=[StepForm()])
     if request.method == 'POST':
         if form.validate_on_submit():
             if form.submit.data:  # Проверяем, была ли нажата кнопка "Создать"

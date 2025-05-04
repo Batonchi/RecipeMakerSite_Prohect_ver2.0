@@ -31,7 +31,7 @@ class RecipeForm(FlaskForm):
     description = TextAreaField('Описание', validators=[DataRequired()], widget=TextArea())
     hashtags = TextAreaField('Хэштеги (#text)', validators=[DataRequired()], widget=TextArea())
     categories = SelectMultipleField('Категория рецепта', choices=['Шаблоны', 'Алгоритмы', 'Инфографики', 'Кулинария',
-                                                                  'Чертежи', 'Другое'], validators=[DataRequired()])
+                                                                   'Чертежи', 'Другое'], validators=[DataRequired()])
     ingredients = FieldList(FormField(IngredientForm), min_entries=1)
     steps = FieldList(FormField(StepForm), min_entries=1)
     result = TextAreaField('Результат', validators=[DataRequired()], widget=TextArea())
