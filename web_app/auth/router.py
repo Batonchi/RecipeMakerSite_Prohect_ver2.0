@@ -18,15 +18,25 @@ async def login_page():
 
 @router.post('/login')
 async def login():
-    email = request.form.get('email')
-    password = request.form.get('password')
-    user = await UserService.get_one_or_none(email=email)
-    if not user or user.password != hash_password(password):
-        return render_template('login.html', form=LoginForm(), message="Invalid credentials")
-    token = create_token(email, password)
-    response = make_response(redirect('/recipe'))
-    response.set_cookie('auth_token', token, httponly=True)
-    return response
+    form = LoginForm()
+
+    if form.create_account.data:
+        return redirect('/recipe/auth/register')
+
+    if form.validate_on_submit():
+        try:
+            email = request.form.get('email')
+            password = request.form.get('password')
+            user = await UserService.get_one_or_none(email=email)
+            if not user or user.password != hash_password(password):
+                return render_template('login.html', form=form, message="Вы допустили ошибку в вводимых данных.")
+            token = create_token(email, password)
+            response = make_response(redirect('/recipe'))
+            response.set_cookie('auth_token', token, httponly=True)
+            return response
+        except Exception as e:
+            print(f"Login error: {e}")
+            return render_template('login.html', form=form, message="Произошла ошибка при входе.")
 
 
 @router.get('/logout')
