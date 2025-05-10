@@ -4,5 +4,5 @@ pycache
 *.pyd
 .git
 .venv
-.e
+.env
 /node_modules
