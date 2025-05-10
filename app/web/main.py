@@ -1,12 +1,15 @@
 from flask import Flask
 from app.web.auth.router import router as auth_router
 from app.base.constant import SECRET_KEY
+from app.web.recipes.router import router as recipes_router
 import os
 
 
 app = Flask(__name__, static_url_path='/web/view/static', template_folder='view')
 app.secret_key = SECRET_KEY
+
 app.register_blueprint(auth_router)
+app.register_blueprint(recipes_router)
 
 
 @app.route('/', methods=['GET', 'POST'])

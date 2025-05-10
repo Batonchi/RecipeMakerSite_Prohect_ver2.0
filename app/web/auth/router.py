@@ -5,11 +5,11 @@ from app.web.auth.forms import LoginForm, RegisterForm
 from app.web.auth.service import create_token, hash_password
 from app.web.users.service import UserService
 
+
 router = flask.Blueprint('auth', __name__,
                          url_prefix='/auth',
                          static_folder='..web/view/static',
                          template_folder='..web/view/')
-
 
 @router.get('/login')
 async def login_page():

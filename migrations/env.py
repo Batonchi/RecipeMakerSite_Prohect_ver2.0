@@ -5,12 +5,12 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from base.database import Base, metadata
-from base.constant import PORT, HOST, DBNAME, PASSWORD, USER
-from web_app.users.model import User, UserToken
-from web_app.pages.model import Pages, Images
-from web_app.recipes.model import Recipe
-from bots.model import AIResponseData
+from app.base.database import Base, metadata
+from app.base.constant import PORT, HOST, DBNAME, PASSWORD, USER
+from app.web.users.model import User, UserToken
+from app.web.pages.model import Pages, Images
+from app.web.recipes.model import Recipe
+from app.bots.model import AIResponseData
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
