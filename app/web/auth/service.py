@@ -19,7 +19,7 @@ def hash_password(password: str):
 
 
 async def get_user_by_token():
-    token = request.cookies.get('token')
+    token = request.cookies.get('auth_token')
     if not token:
         raise HTTPException(status_code=409, detail="Пожалуйста войдите в аккаунт!")
     try:
