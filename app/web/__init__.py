@@ -1,11 +1,11 @@
 from flask import Flask
 from flask_executor import Executor
-from base.constant import SECRET_KEY
+from app.base.constant import SECRET_KEY
 
 
 def create_app():
     app = Flask(__name__,
-                static_url_path='/web_app/view/static',
+                static_url_path='/web_app_init/view/static',
                 template_folder='view')
     app.secret_key = SECRET_KEY
 
@@ -14,8 +14,8 @@ def create_app():
     app.executor = executor
 
     # Импорт и регистрация blueprint'ов
-    from web_app.auth.router import router as auth_router
-    from web_app.recipes.router import router as recipe_router
+    from app.web.auth.router import router as auth_router
+    from app.web.recipes.router import router as recipe_router
 
     app.register_blueprint(auth_router)
     app.register_blueprint(recipe_router)

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block metadata %}{% endblock metadata %}
+    <title>{{ title }}</title>
+    {% block links %}
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+        <link href="/static/css/base.css" rel="stylesheet">
+    {% endblock links %}
+    {% block self_links %}{% endblock self_links %}
+</head>
+<body>
+    {% block header %}
+        <header class="header">
+            <div class="header__text">
+                <h1>pretty recipemaker</h1>
+                <p>конструктор вашего рецепта</p>
+            </div>
+            <nav class="navigation">
+                <button class="elem elem--active recipe elem--top">рецепты</button>
+                <button class="elem profile elem--top">профиль</button>
+                <button class="elem home elem--top">домой</button>
+                <button class="elem about elem--top">о нас</button>
+                <button class="elem elem--active contact elem--top">контакты</button>
+            </nav>
+        </header>
+    {% endblock header%}
+    {% block main_content %}
+    {% endblock main_content%}
+    {% block footer %}
+        <footer class="footer">
+            <div class="navigation">
+                <button class="elem profile elem--bottom">профиль</button>
+                <div class="elem button--scroll-up">↑НАВЕРХ↑</div>
+                <button class="elem home elem--bottom">домой</button>
+                <div class="elem button--scroll-up">↑НАВЕРХ↑</div>
+                <button class="elem contact elem--bottom">контакты</button>
+            </div>
+            <div class="comment">
+                <div class="header__text">
+                    <h2>PRETTY RECIPEMAKER</h2>
+                    <p>ваше мнение очень важно, если встретили ошибку, недочет, напишите нам о них на почту или заполните и отправьте форму ниже </p>
+                </div>
+                <div class="comment__form">
+                    <div class="block--flex_row">
+                        <textarea class="textarea_field" placeholder="оставьте свой отзыв для улучшения работы сервиса"></textarea>
+                        <textarea class="textarea_field" placeholder="место для угроз, жалоб"></textarea>
+                    </div>
+                    <textarea class="textarea_field textarea_field--without_flex" placeholder="место для недочетов или ошибок"></textarea>
+                    <div class="button--frame">
+                        <button>отправить форму</button>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    {% endblock footer %}
+    {% block scripts %}{% endblock scripts %}
+</body>
+</html>

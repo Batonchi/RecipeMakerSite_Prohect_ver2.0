@@ -1,6 +1,6 @@
 pycache
 *.pyc
-*.pyo
+*.pyoё
 *.pyd
 .git
 .venv
