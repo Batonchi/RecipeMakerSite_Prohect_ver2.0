@@ -4,12 +4,16 @@ from werkzeug.exceptions import HTTPException
 from app.web.auth.forms import LoginForm, RegisterForm
 from app.web.auth.service import create_token, hash_password
 from app.web.users.service import UserService
+import os
 
 
 router = flask.Blueprint('auth', __name__,
                          url_prefix='/auth',
-                         static_folder='..web/view/static',
-                         template_folder='..web/view/')
+                         static_url_path='/static',
+                         static_folder=os.path.abspath('app/web/view/static'),
+                         template_folder=os.path.abspath('app/web/view/templates'))
+
+
 
 @router.get('/login')
 async def login_page():

@@ -15,7 +15,7 @@ import asyncio
 router = Blueprint('recipes', __name__,
                    url_prefix='/recipe',
                    static_folder='..web_app_init/view/static',
-                   template_folder='..web_app_init/view/')
+                   template_folder='..web_app_init/view/templates')
 
 
 @router.route('/')

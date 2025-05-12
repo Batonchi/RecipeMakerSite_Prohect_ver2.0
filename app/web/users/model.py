@@ -19,6 +19,8 @@ class User(Base):
 
     usertokens = relationship('UserToken', back_populates='user')
     userrecipes = relationship('Recipe', back_populates='user')
+    complaints = relationship('Complaint', back_populates='user')
+
 
 
 class UserToken(Base):
