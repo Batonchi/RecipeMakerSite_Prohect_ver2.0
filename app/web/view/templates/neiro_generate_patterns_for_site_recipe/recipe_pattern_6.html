@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrettyRecipeMaker - {{ recipe_data.name }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet">
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #545B81;
+            --secondary-color: #686F95;
+            --accent-color: #8F94B4;
+            --bg-color: #f0f0f0;
+            --text-color: #545B81;
+            --card-color: rgba(255, 255, 255, 0.9);
+            --font-family: 'Roboto', sans-serif;
+            --font-size: 16px;
+            --tile-radius: 20px;
+            --bg-pattern: none;
+            --zoom-level: 1;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-family);
+            font-size: var(--font-size);
+            background-color: var(--bg-color);
+            background-image: var(--bg-pattern);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background: var(--primary-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        
+        .header-title {
+            color: white;
+            font-size: 20px;
+            font-weight: 500;
+        }
+        
+        .header-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .control-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            background: var(--accent-color);
+            color: white;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .control-btn:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+        
+        .control-btn i {
+            font-size: 18px;
+        }
+        
+        /* Side panel */
+        .side-panel {
+            position: fixed;
+            top: 60px;
+            right: 0;
+            width: 350px;
+            height: calc(100vh - 120px);
+            background: white;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            overflow-y: auto;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 999;
+        }
+        
+        .side-panel.active {
+            transform: translateX(0);
+        }
+        
+        .close-panel {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 20px;
+        }
+        
+        /* Main content */
+        .main-content {
+            margin-top: 60px;
+            height: calc(100vh - 120px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        .recipe-container {
+            transform: scale(var(--zoom-level));
+            transform-origin: center;
+            transition: transform 0.3s ease;
+            position: relative;
+            width: 1000px;
+            height: 800px;
+        }
+        
+        /* Центральная карточка с рецептом */
+        .recipe-card {
+            position: absolute;
+            width: 600px;
+            height: 500px;
+            background: var(--card-color);
+            border-radius: var(--tile-radius);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            box-sizing: border-box;
+            border: 2px solid var(--primary-color);
+            transition: all 0.5s ease;
+            left: 200px;
+            top: 150px;
+            cursor: grab;
+            user-select: none;
+        }
+        
+        .recipe-card:active {
+            cursor: grabbing;
+        }
+        
+        .recipe-title {
+            font-size: 36px;
+            font-weight: bold;
+            color: var(--text-color);
+            margin-bottom: 20px;
+            text-align: center;
+            transition: all 0.5s ease;
+            font-family: var(--font-family);
+        }
+        
+        .recipe-description {
+            font-size: 18px;
+            color: var(--text-color);
+            text-align: center;
+            max-width: 80%;
+            line-height: 1.6;
+            transition: all 0.5s ease;
+            font-family: var(--font-family);
+        }
+        
+        /* Плитки вокруг центра */
+        .tile {
+            position: absolute;
+            background: var(--secondary-color);
+            border-radius: var(--tile-radius);
+            opacity: 0.9;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border: 2px solid var(--primary-color);
+            padding: 15px;
+            color: white;
+            overflow: hidden;
+            transform-origin: center;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .tile:hover {
+            transform: rotate(0deg) scale(1.05) !important;
+            z-index: 200;
+            opacity: 1;
+        }
+        
+        .tile-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .tile-content {
+            flex-grow: 1;
+            overflow: auto;
+        }
+        
+        .tile-content img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .tile-content table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .tile-content table, .tile-content th, .tile-content td {
+            border: 1px solid white;
+        }
+        
+        .tile-content pre {
+            background: rgba(0,0,0,0.2);
+            padding: 5px;
+            border-radius: 5px;
+            overflow: auto;
+            margin: 0;
+        }
+        
+        /* Footer */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background: var(--primary-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .footer-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .footer-text {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .footer-icon {
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .footer-icon:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Модальные окна */
+        .modal-section {
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        
+        /* Цветовая палитра */
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #ddd;
+        }
+        
+        /* Выбор шрифта */
+        .font-options {
+            margin-top: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .font-option {
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #f0f0f0;
+            transition: all 0.2s;
+        }
+        
+        .font-option:hover {
+            background: #e0e0e0;
+        }
+        
+        /* Размер шрифта */
+        .font-size-control {
+            width: 100%;
+            margin: 10px 0;
+        }
+        
+        /* Добавление плиток */
+        .add-tiles-control {
+            margin-top: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        
+        /* Скругление углов */
+        .radius-control {
+            width: 100%;
+            margin: 10px 0;
+        }
+        
+        /* Паттерны фона */
+        .pattern-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .pattern-option {
+            width: 80px;
+            height: 80px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: 2px solid #ddd;
+            background-size: cover;
+        }
+        
+        /* Загрузка изображения */
+        .image-upload {
+            margin-top: 10px;
+        }
+        
+        /* Сохранение */
+        .save-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        /* Google Fonts */
+        .google-fonts-search {
+            margin-top: 10px;
+        }
+        
+        .google-fonts-results {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-title">PrettyRecipeMaker</div>
+        <div class="header-controls">
+            <button class="control-btn" onclick="showPanel('colorPanel')"><i class="material-symbols-outlined">palette</i> Цвет</button>
+            <button class="control-btn" onclick="showPanel('fontPanel')"><i class="material-symbols-outlined">text_fields</i> Шрифт</button>
+            <button class="control-btn" onclick="showPanel('tilePanel')"><i class="material-symbols-outlined">widgets</i> Плитки</button>
+            <button class="control-btn" onclick="showPanel('bgPanel')"><i class="material-symbols-outlined">image</i> Фон</button>
+            <button class="control-btn" onclick="showPanel('radiusPanel')"><i class="material-symbols-outlined">rounded_corner</i> Углы</button>
+            <button class="control-btn" onclick="showPanel('zoomPanel')"><i class="material-symbols-outlined">zoom_in</i> Зум</button>
+        </div>
+    </header>
+    
+    <!-- Side panels -->
+    <div id="colorPanel" class="side-panel">
+        <span class="close-panel" onclick="hidePanel('colorPanel')">&times;</span>
+        <h3>Настройки цвета</h3>
+        
+        <div class="modal-section">
+            <div class="modal-title">Цвет текста</div>
+            <div class="color-palette">
+                <div class="color-option" style="background: #545B81;" onclick="selectColor('text', '#545B81')"></div>
+                <div class="color-option" style="background: #333333;" onclick="selectColor('text', '#333333')"></div>
+                <div class="color-option" style="background: #000000;" onclick="selectColor('text', '#000000')"></div>
+                <div class="color-option" style="background: #5B3A21;" onclick="selectColor('text', '#5B3A21')"></div>
+                <div class="color-option" style="background: #2D3250;" onclick="selectColor('text', '#2D3250')"></div>
+            </div>
+            <input type="color" id="textColorPicker" onchange="selectColor('text', this.value)" style="margin-top: 10px; width: 100%;">
+        </div>
+        
+        <div class="modal-section">
+            <div class="modal-title">Цвет фона</div>
+            <div class="color-palette">
+                <div class="color-option" style="background: #f0f0f0;" onclick="selectColor('bg', '#f0f0f0')"></div>
+                <div class="color-option" style="background: #ffffff;" onclick="selectColor('bg', '#ffffff')"></div>
+                <div class="color-option" style="background: #e8f4f8;" onclick="selectColor('bg', '#e8f4f8')"></div>
+                <div class="color-option" style="background: #f8f8f0;" onclick="selectColor('bg', '#f8f8f0')"></div>
+                <div class="color-option" style="background: #2a2a2a;" onclick="selectColor('bg', '#2a2a2a')"></div>
+            </div>
+            <input type="color" id="bgColorPicker" onchange="selectColor('bg', this.value)" style="margin-top: 10px; width: 100%;">
+        </div>
+        
+        <div class="modal-section">
+            <div class="modal-title">Цвет плиток</div>
+            <div class="color-palette">
+                <div class="color-option" style="background: #686F95;" onclick="selectColor('panels', '#686F95')"></div>
+                <div class="color-option" style="background: #6F9568;" onclick="selectColor('panels', '#6F9568')"></div>
+                <div class="color-option" style="background: #956868;" onclick="selectColor('panels', '#956868')"></div>
+                <div class="color-option" style="background: #3D4468;" onclick="selectColor('panels', '#3D4468')"></div>
+                <div class="color-option" style="background: #555555;" onclick="selectColor('panels', '#555555')"></div>
+            </div>
+            <input type="color" id="panelColorPicker" onchange="selectColor('panels', this.value)" style="margin-top: 10px; width: 100%;">
+        </div>
+        
+        <div class="modal-section">
+            <div class="modal-title">Цвет подложки</div>
+            <div class="color-palette">
+                <div class="color-option" style="background: #ffffff;" onclick="selectColor('card', '#ffffff')"></div>
+                <div class="color-option" style="background: #f8f8f8;" onclick="selectColor('card', '#f8f8f8')"></div>
+                <div class="color-option" style="background: #fffaf0;" onclick="selectColor('card', '#fffaf0')"></div>
+                <div class="color-option" style="background: #f5f5f5;" onclick="selectColor('card', '#f5f5f5')"></div>
+                <div class="color-option" style="background: #f0fff0;" onclick="selectColor('card', '#f0fff0')"></div>
+            </div>
+            <input type="color" id="cardColorPicker" onchange="selectColor('card', this.value)" style="margin-top: 10px; width: 100%;">
+        </div>
+    </div>
+    
+    <div id="fontPanel" class="side-panel">
+        <span class="close-panel" onclick="hidePanel('fontPanel')">&times;</span>
+        <h3>Настройки шрифта</h3>
+        
+        <div class="modal-section">
+            <div class="modal-title">Стандартные шрифты</div>
+            <div class="font-options">
+                <div class="font-option" style="font-family: 'Roboto', sans-serif;" onclick="selectFont('Roboto, sans-serif')">Roboto</div>
+                <div class="font-option" style="font-family: 'Arial', sans-serif;" onclick="selectFont('Arial, sans-serif')">Arial</div>
+                <div class="font-option" style="font-family: 'Times New Roman', serif;" onclick="selectFont('Times New Roman, serif')">Times New Roman</div>
+                <div class="font-option" style="font-family: 'Courier New', monospace;" onclick="selectFont('Courier New, monospace')">Courier New</div>
+                <div class="font-option" style="font-family: 'Georgia', serif;" onclick="selectFont('Georgia, serif')">Georgia</div>
+                <div class="font-option" style="font-family: 'Verdana', sans-serif;" onclick="selectFont('Verdana, sans-serif')">Verdana</div>
+            </div>
+        </div>
+        
+        <div class="modal-section">
+            <div class="modal-title">Google Fonts</div>
+            <div class="google-fonts-search">
+                <input type="text" id="fontSearch" placeholder="Поиск шрифтов..." class="form-input">
+                <button class="control-btn" onclick="searchGoogleFonts()" style="margin-top: 5px; width: 100%;">Поиск</button>
+            </div>
+            <div id="googleFontsResults" class="google-fonts-results">
+                <!-- Результаты поиска Google Fonts будут здесь -->
+            </div>
+        </div>
+        
+        <div class="modal-section">
+            <div class="modal-title">Размер шрифта</div>
+            <input type="range" id="fontSize" min="12" max="24" value="16" class="font-size-control" oninput="changeFontSize(this.value)">
+            <div style="text-align: center;" id="fontSizeValue">16px</div>
+        </div>
+    </div>
+    
+    <div id="tilePanel" class="side-panel">
+        <span class="close-panel" onclick="hidePanel('tilePanel')">&times;</span>
+        <h3>Управление плитками</h3>
+        
+        <div class="modal-section">
+            <div class="modal-title">Добавить плитку</div>
+            <div class="form-group">
+                <label class="form-label">Количество:</label>
+                <input type="number" id="tilesCount" min="1" max="10" value="1" class="form-input">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Размер:</label>
+                <select id="tileSize" class="form-select">
+                    <option value="small">Маленькие (180x120)</option>
+                    <option value="medium" selected>Средние (280x180)</option>
+                    <option value="large">Большие (350x220)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Тип содержимого:</label>
+                <select id="tileType" class="form-select">
+                    <option value="text">Текст</option>
+                    <option value="image">Изображение</option>
+                    <option value="table">Таблица</option>
+                    <option value="code">Код</option>
+                </select>
+            </div>
+            
+            <div id="tileContentOptions">
+                <!-- Опции для каждого типа содержимого будут здесь -->
+            </div>
+            
+            <button class="control-btn" onclick="addTiles()" style="width: 100%; margin-top: 10px;">Добавить плитки</button>
+        </div>
+    </div>
+    
+    <div id="bgPanel" class="side-panel">
+        <span class="close-panel" onclick="hidePanel('bgPanel')">&times;</span>
+        <h3>Фоновые паттерны</h3>
+        
+        <div class="modal-section">
+            <div class="modal-title">Выберите паттерн</div>
+            <div class="pattern-options">
+                <div class="pattern-option" style="background-color: var(--bg-color);" onclick="selectPattern('none')"></div>
+                <div class="pattern-option" style="background-image: linear-gradient(45deg, #f0f0f0 25%, transparent 25%, transparent 75%, #f0f0f0 75%, #f0f0f0), linear-gradient(45deg, #f0f0f0 25%, transparent 25%, transparent 75%, #f0f0f0 75%, #f0f0f0); background-position: 0 0, 10px 10px; background-size: 20px 20px;" onclick="selectPattern('linear-gradient(45deg, #f0f0f0 25%, transparent 25%, transparent 75%, #f0f0f0 75%, #f0f0f0), linear-gradient(45deg, #f0f0f0 25%, transparent 25%, transparent 75%, #f0f0f0 75%, #f0f0f0); background-position: 0 0, 10px 10px; background-size: 20px 20px;')"></div>
+                <div class="pattern-option" style="background-image: radial-gradient(circle, #f0f0f0 20%, transparent 20%); background-size: 30px 30px;" onclick="selectPattern('radial-gradient(circle, #f0f0f0 20%, transparent 20%); background-size: 30px 30px;')"></div>
+                <div class="pattern-option" style="background-image: linear-gradient(to right, #f0f0f0, #e0e0e0);" onclick="selectPattern('linear-gradient(to right, #f0f0f0, #e0e0e0)')"></div>
+                <div class="pattern-option" style="background-image: repeating-linear-gradient(45deg, #f0f0f0, #f0f0f0 10px, #e0e0e0 10px, #e0e0e0 20px);" onclick="selectPattern('repeating-linear-gradient(45deg, #f0f0f0, #f0f0f0 10px, #e0e0e0 10px, #e0e0e0 20px)')"></div>
+                <div class="pattern-option" style="background-image: url('data:image/svg+xml;utf8,<svg viewBox=\"0 0 100 100\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"50\" cy=\"50\" r=\"40\" fill=\"%23f0f0f0\" opacity=\"0.5\"/></svg>'); background-size: 50px 50px;" onclick="selectPattern('url(\'data:image/svg+xml;utf8,<svg viewBox=\"0 0 100 100\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"50\" cy=\"50\" r=\"40\" fill=\"%23f0f0f0\" opacity=\"0.5\"/></svg>\'); background-size: 50px 50px;')"></div>
+                <div class="pattern-option" style="background-image: linear-gradient(to bottom right, #f0f0f0, #d0d0d0);" onclick="selectPattern('linear-gradient(to bottom right, #f0f0f0, #d0d0d0)')"></div>
+                <div class="pattern-option" style="background-image: repeating-radial-gradient(circle at center, #f0f0f0 0, #e0e0e0 10px, #f0f0f0 20px);" onclick="selectPattern('repeating-radial-gradient(circle at center, #f0f0f0 0, #e0e0e0 10px, #f0f0f0 20px)')"></div>
+                <div class="pattern-option" style="background-image: url('data:image/svg+xml;utf8,<svg viewBox=\"0 0 100 100\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"10\" y=\"10\" width=\"80\" height=\"80\" fill=\"%23f0f0f0\" opacity=\"0.5\"/></svg>'); background-size: 30px 30px;" onclick="selectPattern('url(\'data:image/svg+xml;utf8,<svg viewBox=\"0 0 100 100\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"10\" y=\"10\" width=\"80\" height=\"80\" fill=\"%23f0f0f0\" opacity=\"0.5\"/></svg>\'); background-size: 30px 30px;')"></div>
+                <div class="pattern-option" style="background-image: linear-gradient(0deg, #f0f0f0 50%, #e0e0e0 50%); background-size: 100% 20px;" onclick="selectPattern('linear-gradient(0deg, #f0f0f0 50%, #e0e0e0 50%); background-size: 100% 20px;')"></div>
+            </div>
+            
+            <button class="control-btn" onclick="selectPattern('none')" style="width: 100%; margin-top: 10px;">Без фона</button>
+        </div>
+    </div>
+    
+    <div id="radiusPanel" class="side-panel">
+        <span class="close-panel" onclick="hidePanel('radiusPanel')">&times;</span>
+        <h3>Скругление углов</h3>
+        
+        <div class="modal-section">
+            <div class="modal-title">Уровень скругления</div>
+            <input type="range" id="radiusValue" min="0" max="50" value="20" class="font-size-control" oninput="changeRadius(this.value)">
+            <div style="text-align: center;" id="radiusValueDisplay">20px</div>
+        </div>
+        
+        <div class="modal-section">
+            <div class="modal-title">Угол поворота плиток</div>
+            <input type="number" id="tileAngle" min="-45" max="45" value="0" class="form-input" onchange="updateTileAngles(this.value)">
+            <small>Введите значение от -45 до 45 градусов</small>
+        </div>
+    </div>
+    
+    <div id="zoomPanel" class="side-panel">
+        <span class="close-panel" onclick="hidePanel('zoomPanel')">&times;</span>
+        <h3>Управление масштабом</h3>
+        
+        <div class="modal-section">
+            <div class="modal-title">Масштаб</div>
+            <input type="range" id="zoomLevel" min="0.5" max="2" step="0.1" value="1" class="font-size-control" oninput="changeZoom(this.value)">
+            <div style="text-align: center;" id="zoomLevelValue">100%</div>
+        </div>
+        
+        <div class="modal-section">
+            <div class="modal-title">Автомасштабирование</div>
+            <button class="control-btn" onclick="zoomToFit()" style="width: 100%;">Подогнать по размеру</button>
+        </div>
+    </div>
+    
+    <!-- Main content -->
+    <main class="main-content">
+        <div class="recipe-container" id="recipeContainer">
+            <!-- Центральная карточка с рецептом -->
+            <div class="recipe-card" id="recipeCard">
+                <h1 class="recipe-title">{{ recipe_data.name }}</h1>
+                <p class="recipe-description">{{ recipe_data.content.theme }}</p>
+                
+                <div style="margin-top: 30px; text-align: left; width: 80%;">
+                    <p><strong>Ингредиенты:</strong></p>
+                    <ul style="columns: 2; column-gap: 30px;">
+                        {% for ingredient in recipe_data.content.ingredients %}
+                        <li>{{ ingredient.name }} - {{ ingredient.quantity }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Базовые плитки -->
+            <div class="tile" id="tile1" style="width: 280px; height: 180px; transform: rotate(5deg);">
+                <div class="tile-header">Описание</div>
+                <div class="tile-content">{{ recipe_data.content.description }}</div>
+            </div>
+            
+            <div class="tile" id="tile2" style="width: 280px; height: 180px; transform: rotate(-5deg);">
+                <div class="tile-header">Хэштеги</div>
+                <div class="tile-content">
+                    {% for tag in recipe_data.content.hashtags %}#{{ tag }} {% endfor %}
+                </div>
+            </div>
+            
+            <div class="tile" id="tile3" style="width: 280px; height: 180px; transform: rotate(3deg);">
+                <div class="tile-header">Категории</div>
+                <div class="tile-content">{{ recipe_data.content.categories }}</div>
+            </div>
+            
+            <div class="tile" id="tile4" style="width: 280px; height: 180px; transform: rotate(-3deg);">
+                <div class="tile-header">Шаги</div>
+                <div class="tile-content">
+                    <ol>
+                        {% for step in recipe_data.content.steps %}
+                        <li>{{ step.name }}</li>
+                        {% endfor %}
+                    </ol>
+                </div>
+            </div>
+            
+            <div class="tile" id="tile5" style="width: 280px; height: 180px; transform: rotate(2deg);">
+                <div class="tile-header">Примечания</div>
+                <div class="tile-content">
+                    {% for step in recipe_data.content.steps %}
+                        {% if step.explanations %}
+                        <p><strong>{{ step.number }}.</strong> {{ step.explanations }}</p>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="tile" id="tile6" style="width: 280px; height: 180px; transform: rotate(-2deg);">
+                <div class="tile-header">Результат</div>
+                <div class="tile-content">
+                    <p>{{ recipe_data.content.result }}</p>
+                    {% if recipe_data.content.result_link %}
+                    <p><a href="{{ recipe_data.content.result_link }}" style="color: white;">{{ recipe_data.content.result_link_description }}</a></p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="tile" id="tile7" style="width: 180px; height: 300px; transform: rotate(5deg);">
+                <div class="tile-header">Советы</div>
+                <div class="tile-content">
+                    <p>Здесь могут быть полезные советы по приготовлению этого рецепта...</p>
+                </div>
+            </div>
+            
+            <div class="tile" id="tile8" style="width: 180px; height: 300px; transform: rotate(-5deg);">
+                <div class="tile-header">Варианты</div>
+                <div class="tile-content">
+                    <p>Здесь могут быть варианты замены ингредиентов...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <span class="material-symbols-outlined footer-icon">home</span>
+            <div class="footer-text">PrettyRecipeMaker</div>
+            <span class="material-symbols-outlined footer-icon">person</span>
+        </div>
+    </footer>
+    
+    <!-- Save buttons -->
+    <div style="position: fixed; left: 20px; bottom: 20px; z-index: 1000; display: flex; gap: 10px;">
+        <button class="control-btn" onclick="saveAsHTML()"><i class="material-symbols-outlined">download</i> Сохранить HTML</button>
+        <button class="control-btn" onclick="saveAsPNG()"><i class="material-symbols-outlined">image</i> Сохранить PNG</button>
+    </div>
+    
+    <script>
+        // Текущий элемент для изменения цвета
+        let currentColorTarget = '';
+        let tileCounter = 8; // Начинаем с 9, так как уже есть 8 плиток
+        let isDragging = false;
+        let dragStartX, dragStartY;
+        let initialRecipeCardX = 200;
+        let initialRecipeCardY = 150;
+        let currentAngle = 0;
+        
+        // Показать панель
+        function showPanel(panelId) {
+            // Скрыть все панели сначала
+            document.querySelectorAll('.side-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            
+            // Показать выбранную панель
+            document.getElementById(panelId).classList.add('active');
+        }
+        
+        // Скрыть панель
+        function hidePanel(panelId) {
+            document.getElementById(panelId).classList.remove('active');
+        }
+        
+        // Выбрать цвет
+        function selectColor(target, color) {
+            switch(target) {
+                case 'text':
+                    document.documentElement.style.setProperty('--text-color', color);
+                    break;
+                case 'bg':
+                    document.documentElement.style.setProperty('--bg-color', color);
+                    break;
+                case 'panels':
+                    document.documentElement.style.setProperty('--secondary-color', color);
+                    break;
+                case 'card':
+                    document.documentElement.style.setProperty('--card-color', color);
+                    break;
+            }
+        }
+        
+        // Выбрать шрифт
+        function selectFont(font) {
+            document.documentElement.style.setProperty('--font-family', font);
+        }
+        
+        // Поиск Google Fonts
+        function searchGoogleFonts() {
+            const query = document.getElementById('fontSearch').value;
+            if (!query) return;
+            
+            fetch(`https://www.googleapis.com/webfonts/v1/webfonts?key=YOUR_API_KEY&sort=popularity&query=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    const resultsContainer = document.getElementById('googleFontsResults');
+                    resultsContainer.innerHTML = '';
+                    
+                    if (data.items && data.items.length > 0) {
+                        data.items.slice(0, 10).forEach(font => {
+                            const fontOption = document.createElement('div');
+                            fontOption.className = 'font-option';
+                            fontOption.style.fontFamily = font.family;
+                            fontOption.textContent = font.family;
+                            fontOption.onclick = () => {
+                                // Добавляем шрифт через Google Fonts
+                                const link = document.createElement('link');
+                                link.href = `https://fonts.googleapis.com/css?family=${encodeURIComponent(font.family)}`;
+                                link.rel = 'stylesheet';
+                                document.head.appendChild(link);
+                                
+                                selectFont(font.family);
+                            };
+                            resultsContainer.appendChild(fontOption);
+                        });
+                    } else {
+                        resultsContainer.innerHTML = '<p>Шрифты не найдены</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching Google Fonts:', error);
+                    document.getElementById('googleFontsResults').innerHTML = '<p>Ошибка загрузки шрифтов</p>';
+                });
+        }
+        
+        // Изменить размер шрифта
+        function changeFontSize(size) {
+            document.documentElement.style.setProperty('--font-size', size + 'px');
+            document.getElementById('fontSizeValue').textContent = size + 'px';
+        }
+        
+        // Добавить плитки
+        function addTiles() {
+            const count = parseInt(document.getElementById('tilesCount').value);
+            const size = document.getElementById('tileSize').value;
+            const type = document.getElementById('tileType').value;
+            
+            let width, height;
+            switch(size) {
+                case 'small': width = 180; height = 120; break;
+                case 'medium': width = 280; height = 180; break;
+                case 'large': width = 350; height = 220; break;
+            }
+            
+            for (let i = 0; i < count; i++) {
+                addTile(width, height, type);
+            }
+        }
+        
+        // Добавить одну плитку
+        function addTile(width, height, type) {
+            tileCounter++;
+            const container = document.getElementById('recipeContainer');
+            const tile = document.createElement('div');
+            tile.className = 'tile';
+            tile.id = 'tile' + tileCounter;
+            tile.style.width = width + 'px';
+            tile.style.height = height + 'px';
+            
+            // Угол поворота
+            tile.style.transform = `rotate(${currentAngle}deg)`;
+            
+            // Содержимое плитки в зависимости от типа
+            const tileHeader = document.createElement('div');
+            tileHeader.className = 'tile-header';
+            
+            const tileContent = document.createElement('div');
+            tileContent.className = 'tile-content';
+            
+            switch(type) {
+                case 'text':
+                    tileHeader.textContent = 'Текст ' + tileCounter;
+                    tileContent.innerHTML = '<p>Добавьте свой текст здесь...</p>';
+                    break;
+                case 'image':
+                    tileHeader.textContent = 'Изображение ' + tileCounter;
+                    tileContent.innerHTML = `
+                        <input type="file" accept="image/*" style="display: none;" id="imageUpload${tileCounter}">
+                        <label for="imageUpload${tileCounter}" style="display: flex; justify-content: center; align-items: center; height: 100%; cursor: pointer;">
+                            <span style="text-align: center;">Нажмите для загрузки изображения</span>
+                        </label>
+                    `;
+                    
+                    // Обработчик загрузки изображения
+                    setTimeout(() => {
+                        document.getElementById(`imageUpload${tileCounter}`).addEventListener('change', function(e) {
+                            const file = e.target.files[0];
+                            if (file) {
+                                const reader = new FileReader();
+                                reader.onload = function(event) {
+                                    tileContent.innerHTML = `<img src="${event.target.result}" alt="Загруженное изображение">`;
+                                };
+                                reader.readAsDataURL(file);
+                            }
+                        });
+                    }, 100);
+                    break;
+                case 'table':
+                    tileHeader.textContent = 'Таблица ' + tileCounter;
+                    tileContent.innerHTML = `
+                        <table>
+                            <tr><th>Ингредиент</th><th>Количество</th></tr>
+                            <tr><td>Пример</td><td>100 г</td></tr>
+                            <tr><td>Пример</td><td>200 мл</td></tr>
+                        </table>
+                    `;
+                    break;
+                case 'code':
+                    tileHeader.textContent = 'Код ' + tileCounter;
+                    tileContent.innerHTML = `
+                        <pre><code>// Пример кода
+function example() {
+    return "Hello, World!";
+}</code></pre>
+                    `;
+                    break;
+            }
+            
+            tile.appendChild(tileHeader);
+            tile.appendChild(tileContent);
+            
+            // Позиционирование плитки по кругу
+            const existingTiles = document.querySelectorAll('.tile');
+            const centerX = container.offsetWidth / 2;
+            const centerY = container.offsetHeight / 2;
+            const radius = Math.max(container.offsetWidth, container.offsetHeight) * 0.4;
+            
+            let angle, x, y;
+            let attempts = 0;
+            let positionFound = false;
+            
+            // Попробуем найти свободное место
+            while (!positionFound && attempts < 360) {
+                attempts++;
+                angle = (Math.random() * 360) * Math.PI / 180;
+                x = centerX + Math.cos(angle) * radius - width/2;
+                y = centerY + Math.sin(angle) * radius - height/2;
+                
+                // Проверим пересечение с другими плитками
+                positionFound = true;
+                for (let existingTile of existingTiles) {
+                    const existingRect = existingTile.getBoundingClientRect();
+                    const tileRect = {
+                        left: x,
+                        top: y,
+                        right: x + width,
+                        bottom: y + height
+                    };
+                    
+                    const existingTileRect = {
+                        left: existingRect.left - container.getBoundingClientRect().left,
+                        top: existingRect.top - container.getBoundingClientRect().top,
+                        right: existingRect.right - container.getBoundingClientRect().left,
+                        bottom: existingRect.bottom - container.getBoundingClientRect().top
+                    };
+                    
+                    if (!(tileRect.right < existingTileRect.left || 
+                          tileRect.left > existingTileRect.right || 
+                          tileRect.bottom < existingTileRect.top || 
+                          tileRect.top > existingTileRect.bottom)) {
+                        positionFound = false;
+                        break;
+                    }
+                }
+                
+                // Также проверяем, чтобы не пересекалось с центральной карточкой
+                const recipeCard = document.getElementById('recipeCard');
+                const cardRect = recipeCard.getBoundingClientRect();
+                const cardContainerRect = container.getBoundingClientRect();
+                
+                const cardPosition = {
+                    left: cardRect.left - cardContainerRect.left,
+                    top: cardRect.top - cardContainerRect.top,
+                    right: cardRect.right - cardContainerRect.left,
+                    bottom: cardRect.bottom - cardContainerRect.top
+                };
+                
+                if (!(tileRect.right < cardPosition.left || 
+                      tileRect.left > cardPosition.right || 
+                      tileRect.bottom < cardPosition.top || 
+                      tileRect.top > cardPosition.bottom)) {
+                    positionFound = false;
+                }
+            }
+            
+            // Если не нашли свободное место, размещаем в случайном месте
+            if (!positionFound) {
+                x = Math.random() * (container.offsetWidth - width);
+                y = Math.random() * (container.offsetHeight - height);
+            }
+            
+            tile.style.left = x + 'px';
+            tile.style.top = y + 'px';
+            
+            container.appendChild(tile);
+        }
+        
+        // Изменить скругление углов
+        function changeRadius(value) {
+            document.documentElement.style.setProperty('--tile-radius', value + 'px');
+            document.getElementById('radiusValueDisplay').textContent = value + 'px';
+        }
+        
+        // Обновить углы поворота всех плиток
+        function updateTileAngles(angle) {
+            currentAngle = parseInt(angle);
+            document.querySelectorAll('.tile').forEach(tile => {
+                const currentTransform = tile.style.transform;
+                const translateMatch = currentTransform.match(/translate\(([^)]+)\)/);
+                const translate = translateMatch ? `translate(${translateMatch[1]})` : '';
+                tile.style.transform = `${translate} rotate(${currentAngle}deg)`;
+            });
+        }
+        
+        // Выбрать паттерн фона
+        function selectPattern(pattern) {
+            if (pattern === 'none') {
+                document.documentElement.style.setProperty('--bg-pattern', 'none');
+            } else {
+                document.documentElement.style.setProperty('--bg-pattern', pattern);
+            }
+        }
+        
+        // Изменить масштаб
+        function changeZoom(level) {
+            document.documentElement.style.setProperty('--zoom-level', level);
+            document.getElementById('zoomLevelValue').textContent = Math.round(level * 100) + '%';
+        }
+        
+        // Подогнать по размеру
+        function zoomToFit() {
+            const container = document.getElementById('recipeContainer');
+            const tiles = document.querySelectorAll('.tile');
+            
+            let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+            
+            // Добавляем центральную карточку
+            const card = document.getElementById('recipeCard');
+            const cardRect = card.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+            
+            const cardLeft = cardRect.left - containerRect.left;
+            const cardTop = cardRect.top - containerRect.top;
+            const cardRight = cardLeft + cardRect.width;
+            const cardBottom = cardTop + cardRect.height;
+            
+            minX = Math.min(minX, cardLeft);
+            minY = Math.min(minY, cardTop);
+            maxX = Math.max(maxX, cardRight);
+            maxY = Math.max(maxY, cardBottom);
+            
+            // Добавляем все плитки
+            tiles.forEach(tile => {
+                const rect = tile.getBoundingClientRect();
+                const left = rect.left - containerRect.left;
+                const top = rect.top - containerRect.top;
+                const right = left + rect.width;
+                const bottom = top + rect.height;
+                
+                minX = Math.min(minX, left);
+                minY = Math.min(minY, top);
+                maxX = Math.max(maxX, right);
+                maxY = Math.max(maxY, bottom);
+            });
+            
+            const contentWidth = maxX - minX;
+            const contentHeight = maxY - minY;
+            
+            const viewportWidth = container.offsetWidth;
+            const viewportHeight = container.offsetHeight;
+            
+            const zoomX = viewportWidth / (contentWidth + 100);
+            const zoomY = viewportHeight / (contentHeight + 100);
+            
+            const zoomLevel = Math.min(zoomX, zoomY, 1); // Не увеличивать больше 100%
+            changeZoom(zoomLevel);
+        }
+        
+        // Сохранить как HTML
+        function saveAsHTML() {
+            // Создаем клон контейнера без элементов управления
+            const container = document.getElementById('recipeContainer');
+            const clone = container.cloneNode(true);
+            
+            // Удаляем все обработчики событий
+            clone.querySelectorAll('*').forEach(el => {
+                el.onclick = null;
+                el.onmouseover = null;
+                el.onmouseout = null;
+            });
+            
+            // Устанавливаем все плитки параллельно
+            clone.querySelectorAll('.tile').forEach(tile => {
+                tile.style.transform = 'rotate(0deg)';
+            });
+            
+            // Создаем HTML строку
+            const html = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>${document.title}</title>
+                    <style>
+                        body {
+                            margin: 0;
+                            padding: 0;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            min-height: 100vh;
+                            background-color: ${getComputedStyle(document.documentElement).getPropertyValue('--bg-color')};
+                            background-image: ${getComputedStyle(document.documentElement).getPropertyValue('--bg-pattern')};
+                            font-family: ${getComputedStyle(document.documentElement).getPropertyValue('--font-family')};
+                            font-size: ${getComputedStyle(document.documentElement).getPropertyValue('--font-size')};
+                        }
+                        
+                        .recipe-container {
+                            position: relative;
+                            width: 1000px;
+                            height: 800px;
+                        }
+                        
+                        .recipe-card {
+                            position: absolute;
+                            width: 600px;
+                            height: 500px;
+                            background: ${getComputedStyle(document.documentElement).getPropertyValue('--card-color')};
+                            border-radius: ${getComputedStyle(document.documentElement).getPropertyValue('--tile-radius')};
+                            border: 2px solid ${getComputedStyle(document.documentElement).getPropertyValue('--primary-color')};
+                            padding: 40px;
+                            box-sizing: border-box;
+                            left: 200px;
+                            top: 150px;
+                        }
+                        
+                        .tile {
+                            position: absolute;
+                            background: ${getComputedStyle(document.documentElement).getPropertyValue('--secondary-color')};
+                            border-radius: ${getComputedStyle(document.documentElement).getPropertyValue('--tile-radius')};
+                            border: 2px solid ${getComputedStyle(document.documentElement).getPropertyValue('--primary-color')};
+                            padding: 15px;
+                            color: white;
+                            overflow: hidden;
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${clone.outerHTML}
+                </body>
+                </html>
+            `;
+            
+            // Создаем Blob и ссылку для скачивания
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'recipe.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        // Сохранить как PNG
+        function saveAsPNG() {
+            // Сначала устанавливаем все плитки параллельно
+            const tiles = document.querySelectorAll('.tile');
+            const originalTransforms = [];
+            
+            tiles.forEach(tile => {
+                originalTransforms.push(tile.style.transform);
+                tile.style.transform = 'rotate(0deg)';
+            });
+            
+            // Затем делаем скриншот
+            html2canvas(document.getElementById('recipeContainer'), {
+                backgroundColor: null,
+                scale: 2,
+                logging: false,
+                useCORS: true
+            }).then(canvas => {
+                // Восстанавливаем оригинальные трансформации
+                tiles.forEach((tile, index) => {
+                    tile.style.transform = originalTransforms[index];
+                });
+                
+                // Создаем ссылку для скачивания
+                const link = document.createElement('a');
+                link.download = 'recipe.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+        
+        // Перетаскивание центральной карточки
+        document.getElementById('recipeCard').addEventListener('mousedown', function(e) {
+            isDragging = true;
+            dragStartX = e.clientX;
+            dragStartY = e.clientY;
+            
+            const rect = this.getBoundingClientRect();
+            initialRecipeCardX = rect.left - parseInt(this.style.left || '200');
+            initialRecipeCardY = rect.top - parseInt(this.style.top || '150');
+            
+            this.style.cursor = 'grabbing';
+        });
+        
+        document.addEventListener('mousemove', function(e) {
+            if (!isDragging) return;
+            
+            const card = document.getElementById('recipeCard');
+            const dx = e.clientX - dragStartX;
+            const dy = e.clientY - dragStartY;
+            
+            const newX = parseInt(card.style.left || '200') + dx;
+            const newY = parseInt(card.style.top || '150') + dy;
+            
+            card.style.left = newX + 'px';
+            card.style.top = newY + 'px';
+            
+            dragStartX = e.clientX;
+            dragStartY = e.clientY;
+        });
+        
+        document.addEventListener('mouseup', function() {
+            if (isDragging) {
+                isDragging = false;
+                document.getElementById('recipeCard').style.cursor = 'grab';
+            }
+        });
+        
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            // Установка начальных значений
+            document.documentElement.style.setProperty('--tile-radius', '20px');
+            document.getElementById('radiusValue').value = 20;
+            document.getElementById('radiusValueDisplay').textContent = '20px';
+            document.getElementById('fontSizeValue').textContent = '16px';
+            document.getElementById('zoomLevelValue').textContent = '100%';
+            
+            // Позиционируем базовые плитки по кругу
+            positionInitialTiles();
+        });
+        
+        // Позиционирование начальных плиток по кругу
+        function positionInitialTiles() {
+            const container = document.getElementById('recipeContainer');
+            const centerX = container.offsetWidth / 2;
+            const centerY = container.offsetHeight / 2;
+            const radius = 300;
+            
+            const angles = [0, 45, 90, 135, 180, 225, 270, 315];
+            
+            document.querySelectorAll('.tile').forEach((tile, index) => {
+                if (index >= angles.length) return;
+                
+                const angle = angles[index] * Math.PI / 180;
+                const x = centerX + Math.cos(angle) * radius - tile.offsetWidth/2;
+                const y = centerY + Math.sin(angle) * radius - tile.offsetHeight/2;
+                
+                tile.style.left = x + 'px';
+                tile.style.top = y + 'px';
+            });
+        }
+    </script>
+</body>
+</html>

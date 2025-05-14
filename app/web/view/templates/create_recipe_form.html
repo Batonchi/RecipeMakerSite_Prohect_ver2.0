@@ -45,50 +45,55 @@
                     <button id="select_category" class="border_bottom select_category" type="button">выберите категорию рецепта</button>
                     <div class="ingredients block--flex_column">
                         <h2 class="header_2">Инградиенты</h2>
-                        <div class="ingredient block--flex_row">
-                            <label class="id_ing">1</label>
-                            <input type="text" id="name_ing" class="style_font" placeholder="наименование">
-                            <input type="text" id="for_need" class="style_font" placeholder="для чего">
-                            <input type="text" id="count" class="style_font" placeholder="кол-во">
-                            <label class="label__button--delete_ing">x</label>
+                        <div class="block--flex_column" id="cont_ing">
+                            <div class="ingredient block--flex_row">
+                                <label class="id_ing">1</label>
+                                <input type="text" id="name_ing" class="style_font" placeholder="наименование">
+                                <input type="text" id="for_need" class="style_font" placeholder="для чего">
+                                <input type="text" id="count" class="style_font" placeholder="кол-во">
+                                <label class="label__button--delete_ing">x</label>
+                            </div>
                         </div>
+
                         <button class="plus_ing border_bottom">+</button>
                     </div>
                     <div class="steps border_top border_bottom">
                         <div class="header__text border_top">
                             <h2 class="header_2">Этапы</h2>
                         </div>
-                        <div class="steps__elem">
-                            <div class="block--flex_row">
-                                <div class="block--flex_column">
-                                    <div class="grid_input_custom_label var_grid_1">
-                                        <div class="label_back border_bottom_right_top_left">имя</div>
-                                        <input type="text" class="border_bottom style_font limit_width_input" required>
-                                        <div class="border_bottom label_back">номер</div>
-                                        <input type="text" class="style_font border_top_right_bottom_left limit_width_input" required>
-                                    </div>
-                                    <div class="grid_input_custom_label var_grid_2">
-                                        <div class="label_back border_right">описание</div>
-                                        <textarea type="text" id="description" class="style_font border_left" required style="resize: none; border: none"></textarea>
-                                        <div class="label_back border_top_right_bottom_left">пояснение</div>
-                                        <textarea type="text" id="additional_info" class="style_font border_bottom_right_top_left" required style="resize: none; border: none"></textarea>
-                                    </div>
-                                    <div class="step--add_graphic border_top border_bottom">
-                                        <div id="container_graph" class="border_bottom border_top container">
-                                            выберите графическую состовляющею этапа
+                        <div class="block--flex_column">
+                            <div class="steps__elem">
+                                <div class="block--flex_row">
+                                    <div class="block--flex_column">
+                                        <div class="grid_input_custom_label var_grid_1">
+                                            <div class="label_back border_bottom_right_top_left">имя</div>
+                                            <input type="text" class="border_bottom style_font limit_width_input" required>
+                                            <div class="border_bottom label_back">номер</div>
+                                            <input type="text" class="style_font border_top_right_bottom_left limit_width_input" required>
                                         </div>
-                                        <button class="border_bottom button--add_images">+</button>
-                                    </div>
-                                    <div class="step--add_links links--add  border_bottom border_top">
-                                        <div class="container border_bottom border_top" id="step_links">
-                                            <input type="text" placeholder="куда ведет" class="where border_bottom border_top" required>
-                                            <input type="text" placeholder="ссылка" class="link_str border_bottom border_top" required>
+                                        <div class="grid_input_custom_label var_grid_2">
+                                            <div class="label_back border_right">описание</div>
+                                            <textarea type="text" id="description" class="style_font border_left" required style="resize: none; border: none"></textarea>
+                                            <div class="label_back border_top_right_bottom_left">пояснение</div>
+                                            <textarea type="text" id="additional_info" class="style_font border_bottom_right_top_left" required style="resize: none; border: none"></textarea>
                                         </div>
-                                        <div class="between_link_and_add  border_bottom border_top">нажмите +, чтобы добавить ссылку</div>
-                                        <button class="add-button border_bottom">+</button>
+                                        <div class="step--add_graphic border_top border_bottom">
+                                            <div id="container_graph" class="border_bottom border_top container">
+                                                выберите графическую состовляющею этапа
+                                            </div>
+                                            <button class="border_bottom button--add_images">+</button>
+                                        </div>
+                                        <div class="step--add_links links--add  border_bottom border_top">
+                                            <div class="container border_bottom border_top" id="step_links">
+                                                <input type="text" placeholder="куда ведет" class="where border_bottom border_top" required>
+                                                <input type="text" placeholder="ссылка" class="link_str border_bottom border_top" required>
+                                            </div>
+                                            <div class="between_link_and_add  border_bottom border_top">нажмите +, чтобы добавить ссылку</div>
+                                            <button class="add-button border_bottom">+</button>
+                                        </div>
                                     </div>
+                                    <button class="step__elem--del">x</button>
                                 </div>
-                                <button class="step__elem--del">x</button>
                             </div>
                             <button class="add-button border_bottom">+</button>
                         </div>

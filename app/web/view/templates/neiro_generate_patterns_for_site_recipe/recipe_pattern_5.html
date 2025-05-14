@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ recipe_data.name }}</title>
+    <style>
+        :root {
+            --primary-color: #545B81;
+            --secondary-color: #686F95;
+            --accent-color: #8F94B4;
+            --bg-color: #f0f0f0;
+            --text-color: #545B81;
+            --card-color: rgba(255, 255, 255, 0.9);
+            --font-family: 'Arial', sans-serif;
+            --font-size: 16px;
+            --tile-radius: 20px;
+            --bg-pattern: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            background-image: var(--bg-pattern);
+            font-family: var(--font-family);
+            font-size: var(--font-size);
+            overflow: hidden;
+            transition: all 0.5s ease;
+        }
+
+        .container {
+            position: relative;
+            width: 1000px;
+            height: 800px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Центральная карточка с рецептом */
+        .recipe-card {
+            position: absolute;
+            width: 600px;
+            height: 500px;
+            background: var(--card-color);
+            border-radius: var(--tile-radius);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            box-sizing: border-box;
+            border: 2px solid var(--primary-color);
+            transition: all 0.5s ease;
+        }
+
+        .recipe-title {
+            font-size: 36px;
+            font-weight: bold;
+            color: var(--text-color);
+            margin-bottom: 20px;
+            text-align: center;
+            transition: all 0.5s ease;
+            font-family: var(--font-family);
+        }
+
+        .recipe-description {
+            font-size: 18px;
+            color: var(--text-color);
+            text-align: center;
+            max-width: 80%;
+            line-height: 1.6;
+            transition: all 0.5s ease;
+            font-family: var(--font-family);
+        }
+
+        /* Плитки вокруг центра */
+        .tile {
+            position: absolute;
+            background: var(--secondary-color);
+            border-radius: var(--tile-radius);
+            opacity: 0.9;
+            transition: all 0.5s ease;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border: 2px solid var(--primary-color);
+            padding: 20px;
+            color: white;
+            overflow: hidden;
+            transform-origin: center;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .tile:hover {
+            transform: rotate(0deg) scale(1.05) !important;
+            z-index: 200;
+            opacity: 1;
+        }
+
+        /* Элементы управления */
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .control-btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            background: var(--primary-color);
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            font-family: var(--font-family);
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Модальные окна */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 300px;
+            max-width: 90%;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+        }
+
+        .close-btn {
+            float: right;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        /* Цветовая палитра */
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #ddd;
+        }
+
+        /* Выбор шрифта */
+        .font-options {
+            margin-top: 15px;
+        }
+
+        .font-option {
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #f0f0f0;
+            transition: all 0.2s;
+        }
+
+        .font-option:hover {
+            background: #e0e0e0;
+        }
+
+        /* Размер шрифта */
+        .font-size-control {
+            width: 100%;
+            margin: 15px 0;
+        }
+
+        /* Добавление плиток */
+        .add-tiles-control {
+            margin-top: 15px;
+        }
+
+        .add-tiles-input {
+            width: 100%;
+            padding: 8px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+
+        /* Скругление углов */
+        .radius-control {
+            width: 100%;
+            margin: 15px 0;
+        }
+
+        /* Паттерны фона */
+        .pattern-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .pattern-option {
+            width: 80px;
+            height: 80px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: 2px solid #ddd;
+            background-size: cover;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="container">
+        <!-- Центральная карточка с рецептом -->
+        <div class="recipe-card">
+            <h1 class="recipe-title">{{ recipe_data.name }}</h1>
+            <p class="recipe-description">{{ recipe_data.content.theme }}</p>
+
+            <div style="margin-top: 30px; text-align: left; width: 80%;">
+                <p><strong>Ингредиенты:</strong></p>
+                <ul style="columns: 2; column-gap: 30px;">
+                    {% for ingredient in recipe_data.content.ingredients %}
+                    <li>{{ ingredient.name }} - {{ ingredient.quantity }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Базовые плитки -->
+        <div class="tile" id="tile1" style="width: 280px; height: 180px; top: 50px; left: 50px; transform: rotate(-5deg);">
+            <h3>Описание</h3>
+            <p>{{ recipe_data.content.description }}</p>
+        </div>
+
+        <div class="tile" id="tile2" style="width: 280px; height: 180px; top: 30px; left: 360px; transform: rotate(-2deg);">
+            <h3>Хэштеги</h3>
+            <p>{% for tag in recipe_data.content.hashtags %}#{{ tag }} {% endfor %}</p>
+        </div>
+
+        <div class="tile" id="tile3" style="width: 280px; height: 180px; top: 50px; right: 50px; transform: rotate(5deg);">
+            <h3>Категории</h3>
+            <p>{{ recipe_data.content.categories }}</p>
+        </div>
+
+        <div class="tile" id="tile4" style="width: 280px; height: 180px; bottom: 50px; left: 50px; transform: rotate(5deg);">
+            <h3>Шаги</h3>
+            <ol>
+                {% for step in recipe_data.content.steps %}
+                <li>{{ step.name }}</li>
+                {% endfor %}
+            </ol>
+        </div>
+
+        <div class="tile" id="tile5" style="width: 280px; height: 180px; bottom: 30px; left: 360px; transform: rotate(2deg);">
+            <h3>Примечания</h3>
+            {% for step in recipe_data.content.steps %}
+                {% if step.explanations %}
+                <p><strong>{{ step.number }}.</strong> {{ step.explanations }}</p>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="tile" id="tile6" style="width: 280px; height: 180px; bottom: 50px; right: 50px; transform: rotate(-5deg);">
+            <h3>Результат</h3>
+            <p>{{ recipe_data.content.result }}</p>
+            {% if recipe_data.content.result_link %}
+            <p><a href="{{ recipe_data.content.result_link }}" style="color: white;">{{ recipe_data.content.result_link_description }}</a></p>
+            {% endif %}
+        </div>
+
+        <div class="tile" id="tile7" style="width: 180px; height: 300px; left: 50px; top: 250px; transform: rotate(3deg);">
+            <h3>Советы</h3>
+            <p>Здесь могут быть полезные советы по приготовлению этого рецепта...</p>
+        </div>
+
+        <div class="tile" id="tile8" style="width: 180px; height: 300px; right: 50px; top: 250px; transform: rotate(-3deg);">
+            <h3>Варианты</h3>
+            <p>Здесь могут быть варианты замены ингредиентов...</p>
+        </div>
+    </div>
+
+    <!-- Элементы управления -->
+    <div class="controls">
+        <button class="control-btn" onclick="showColorModal('text')">Цвет текста</button>
+        <button class="control-btn" onclick="showColorModal('bg')">Цвет фона</button>
+        <button class="control-btn" onclick="showColorModal('panels')">Цвет плиток</button>
+        <button class="control-btn" onclick="showColorModal('card')">Цвет подложки</button>
+        <button class="control-btn" onclick="showFontModal()">Шрифт и размер</button>
+        <button class="control-btn" onclick="showAddTilesModal()">Добавить плитки</button>
+        <button class="control-btn" onclick="showRadiusModal()">Скругление углов</button>
+        <button class="control-btn" onclick="showPatternModal()">Фоновый паттерн</button>
+    </div>
+
+    <!-- Модальное окно выбора цвета -->
+    <div id="colorModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('colorModal')">&times;</span>
+            <h3 id="colorModalTitle">Выберите цвет</h3>
+            <div class="color-palette">
+                <div class="color-option" style="background: #545B81;" onclick="selectColor('#545B81')"></div>
+                <div class="color-option" style="background: #686F95;" onclick="selectColor('#686F95')"></div>
+                <div class="color-option" style="background: #8F94B4;" onclick="selectColor('#8F94B4')"></div>
+                <div class="color-option" style="background: #5B8154;" onclick="selectColor('#5B8154')"></div>
+                <div class="color-option" style="background: #6F9568;" onclick="selectColor('#6F9568')"></div>
+                <div class="color-option" style="background: #815454;" onclick="selectColor('#815454')"></div>
+                <div class="color-option" style="background: #956868;" onclick="selectColor('#956868')"></div>
+                <div class="color-option" style="background: #2D3250;" onclick="selectColor('#2D3250')"></div>
+                <div class="color-option" style="background: #3D4468;" onclick="selectColor('#3D4468')"></div>
+                <div class="color-option" style="background: #5A618F;" onclick="selectColor('#5A618F')"></div>
+                <div class="color-option" style="background: #333333;" onclick="selectColor('#333333')"></div>
+                <div class="color-option" style="background: #555555;" onclick="selectColor('#555555')"></div>
+                <div class="color-option" style="background: #777777;" onclick="selectColor('#777777')"></div>
+                <div class="color-option" style="background: #990000;" onclick="selectColor('#990000')"></div>
+                <div class="color-option" style="background: #009900;" onclick="selectColor('#009900')"></div>
+            </div>
+            <input type="color" id="customColor" style="margin-top: 15px; width: 100%;" onchange="selectColor(this.value)">
+        </div>
+    </div>
+
+    <!-- Модальное окно выбора шрифта -->
+    <div id="fontModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('fontModal')">&times;</span>
+            <h3>Выберите шрифт и размер</h3>
+
+            <div class="font-options">
+                <div class="font-option" style="font-family: 'Arial', sans-serif;" onclick="selectFont('Arial, sans-serif')">Arial</div>
+                <div class="font-option" style="font-family: 'Times New Roman', serif;" onclick="selectFont('Times New Roman, serif')">Times New Roman</div>
+                <div class="font-option" style="font-family: 'Courier New', monospace;" onclick="selectFont('Courier New, monospace')">Courier New</div>
+                <div class="font-option" style="font-family: 'Georgia', serif;" onclick="selectFont('Georgia, serif')">Georgia</div>
+                <div class="font-option" style="font-family: 'Verdana', sans-serif;" onclick="selectFont('Verdana, sans-serif')">Verdana</div>
+            </div>
+
+            <label for="fontSize">Размер шрифта:</label>
+            <input type="range" id="fontSize" min="12" max="24" value="16" class="font-size-control" oninput="changeFontSize(this.value)">
+            <div style="text-align: center;" id="fontSizeValue">16px</div>
+        </div>
+    </div>
+
+    <!-- Модальное окно добавления плиток -->
+    <div id="addTilesModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('addTilesModal')">&times;</span>
+            <h3>Добавить плитки</h3>
+
+            <div class="add-tiles-control">
+                <label for="tilesCount">Количество плиток:</label>
+                <input type="number" id="tilesCount" min="1" max="20" value="1" class="add-tiles-input">
+
+                <label for="tileSize">Размер плиток:</label>
+                <select id="tileSize" class="add-tiles-input">
+                    <option value="small">Маленькие (180x120)</option>
+                    <option value="medium" selected>Средние (280x180)</option>
+                    <option value="large">Большие (350x220)</option>
+                </select>
+
+                <button class="control-btn" style="width: 100%; margin-top: 10px;" onclick="addTiles()">Добавить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно скругления углов -->
+    <div id="radiusModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('radiusModal')">&times;</span>
+            <h3>Скругление углов</h3>
+
+            <div class="radius-control">
+                <label for="radiusValue">Уровень скругления:</label>
+                <input type="range" id="radiusValue" min="0" max="50" value="20" class="font-size-control" oninput="changeRadius(this.value)">
+                <div style="text-align: center;" id="radiusValueDisplay">20px</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно выбора фонового паттерна -->
+    <div id="patternModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('patternModal')">&times;</span>
+            <h3>Выберите фоновый паттерн</h3>
+
+            <div class="pattern-options">
+                <div class="pattern-option" style="background-color: #f0f0f0;" onclick="selectPattern('none')"></div>
+                <div class="pattern-option" style="background-image: linear-gradient(45deg, #f0f0f0 25%, transparent 25%, transparent 75%, #f0f0f0 75%, #f0f0f0), linear-gradient(45deg, #f0f0f0 25%, transparent 25%, transparent 75%, #f0f0f0 75%, #f0f0f0); background-position: 0 0, 10px 10px; background-size: 20px 20px;" onclick="selectPattern('linear-gradient(45deg, #f0f0f0 25%, transparent 25%, transparent 75%, #f0f0f0 75%, #f0f0f0), linear-gradient(45deg, #f0f0f0 25%, transparent 25%, transparent 75%, #f0f0f0 75%, #f0f0f0); background-position: 0 0, 10px 10px; background-size: 20px 20px;')"></div>
+                <div class="pattern-option" style="background-image: radial-gradient(circle, #f0f0f0 20%, transparent 20%); background-size: 30px 30px;" onclick="selectPattern('radial-gradient(circle, #f0f0f0 20%, transparent 20%); background-size: 30px 30px;')"></div>
+                <div class="pattern-option" style="background-image: linear-gradient(to right, #f0f0f0, #e0e0e0);" onclick="selectPattern('linear-gradient(to right, #f0f0f0, #e0e0e0)')"></div>
+                <div class="pattern-option" style="background-image: repeating-linear-gradient(45deg, #f0f0f0, #f0f0f0 10px, #e0e0e0 10px, #e0e0e0 20px);" onclick="selectPattern('repeating-linear-gradient(45deg, #f0f0f0, #f0f0f0 10px, #e0e0e0 10px, #e0e0e0 20px)')"></div>
+                <div class="pattern-option" style="background-image: url('data:image/svg+xml;utf8,<svg viewBox=\"0 0 100 100\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"50\" cy=\"50\" r=\"40\" fill=\"%23f0f0f0\" opacity=\"0.5\"/></svg>'); background-size: 50px 50px;" onclick="selectPattern('url(\'data:image/svg+xml;utf8,<svg viewBox=\"0 0 100 100\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"50\" cy=\"50\" r=\"40\" fill=\"%23f0f0f0\" opacity=\"0.5\"/></svg>\'); background-size: 50px 50px;')"></div>
+                <div class="pattern-option" style="background-image: linear-gradient(to bottom right, #f0f0f0, #d0d0d0);" onclick="selectPattern('linear-gradient(to bottom right, #f0f0f0, #d0d0d0)')"></div>
+                <div class="pattern-option" style="background-image: repeating-radial-gradient(circle at center, #f0f0f0 0, #e0e0e0 10px, #f0f0f0 20px);" onclick="selectPattern('repeating-radial-gradient(circle at center, #f0f0f0 0, #e0e0e0 10px, #f0f0f0 20px)')"></div>
+                <div class="pattern-option" style="background-image: url('data:image/svg+xml;utf8,<svg viewBox=\"0 0 100 100\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"10\" y=\"10\" width=\"80\" height=\"80\" fill=\"%23f0f0f0\" opacity=\"0.5\"/></svg>'); background-size: 30px 30px;" onclick="selectPattern('url(\'data:image/svg+xml;utf8,<svg viewBox=\"0 0 100 100\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"10\" y=\"10\" width=\"80\" height=\"80\" fill=\"%23f0f0f0\" opacity=\"0.5\"/></svg>\'); background-size: 30px 30px;')"></div>
+                <div class="pattern-option" style="background-image: linear-gradient(0deg, #f0f0f0 50%, #e0e0e0 50%); background-size: 100% 20px;" onclick="selectPattern('linear-gradient(0deg, #f0f0f0 50%, #e0e0e0 50%); background-size: 100% 20px;')"></div>
+            </div>
+
+            <button class="control-btn" style="width: 100%; margin-top: 10px;" onclick="selectPattern('none')">Без фона</button>
+        </div>
+    </div>
+
+    <script>
+        // Текущий элемент для изменения цвета
+        let currentColorTarget = '';
+        let tileCounter = 8; // Начинаем с 9, так как уже есть 8 плиток
+
+        // Показать модальное окно выбора цвета
+        function showColorModal(target) {
+            currentColorTarget = target;
+            const modal = document.getElementById('colorModal');
+            const title = document.getElementById('colorModalTitle');
+
+            switch(target) {
+                case 'text': title.textContent = 'Выберите цвет текста'; break;
+                case 'bg': title.textContent = 'Выберите цвет фона'; break;
+                case 'panels': title.textContent = 'Выберите цвет плиток'; break;
+                case 'card': title.textContent = 'Выберите цвет подложки'; break;
+            }
+
+            modal.style.display = 'flex';
+        }
+
+        // Выбрать цвет
+        function selectColor(color) {
+            switch(currentColorTarget) {
+                case 'text':
+                    document.documentElement.style.setProperty('--text-color', color);
+                    break;
+                case 'bg':
+                    document.documentElement.style.setProperty('--bg-color', color);
+                    break;
+                case 'panels':
+                    document.documentElement.style.setProperty('--primary-color', color);
+                    document.documentElement.style.setProperty('--secondary-color', lightenColor(color, 20));
+                    document.documentElement.style.setProperty('--accent-color', lightenColor(color, 40));
+                    break;
+                case 'card':
+                    document.documentElement.style.setProperty('--card-color', lightenColor(color, 60));
+                    break;
+            }
+        }
+
+        // Осветлить цвет
+        function lightenColor(color, percent) {
+            const num = parseInt(color.replace('#', ''), 16);
+            const amt = Math.round(2.55 * percent);
+            const R = (num >> 16) + amt;
+            const G = (num >> 8 & 0x00FF) + amt;
+            const B = (num & 0x0000FF) + amt;
+
+            return '#' + (
+                0x1000000 +
+                (R < 255 ? (R < 1 ? 0 : R) : 255) * 0x10000 +
+                (G < 255 ? (G < 1 ? 0 : G) : 255) * 0x100 +
+                (B < 255 ? (B < 1 ? 0 : B) : 255)
+            ).toString(16).slice(1);
+        }
+
+        // Показать модальное окно выбора шрифта
+        function showFontModal() {
+            document.getElementById('fontModal').style.display = 'flex';
+        }
+
+        // Выбрать шрифт
+        function selectFont(font) {
+            document.documentElement.style.setProperty('--font-family', font);
+        }
+
+        // Изменить размер шрифта
+        function changeFontSize(size) {
+            document.documentElement.style.setProperty('--font-size', size + 'px');
+            document.getElementById('fontSizeValue').textContent = size + 'px';
+        }
+
+        // Показать модальное окно добавления плиток
+        function showAddTilesModal() {
+            document.getElementById('addTilesModal').style.display = 'flex';
+        }
+
+        // Добавить плитки
+        function addTiles() {
+            const count = parseInt(document.getElementById('tilesCount').value);
+            const size = document.getElementById('tileSize').value;
+
+            let width, height;
+            switch(size) {
+                case 'small': width = 180; height = 120; break;
+                case 'medium': width = 280; height = 180; break;
+                case 'large': width = 350; height = 220; break;
+            }
+
+            for (let i = 0; i < count; i++) {
+                addTile(width, height);
+            }
+
+            closeModal('addTilesModal');
+        }
+
+        // Добавить одну плитку
+        function addTile(width, height) {
+            tileCounter++;
+            const container = document.getElementById('container');
+            const tile = document.createElement('div');
+            tile.className = 'tile';
+            tile.id = 'tile' + tileCounter;
+
+            // Генерация случайной позиции, избегая пересечений
+            let x, y, angle;
+            let attempts = 0;
+            const maxAttempts = 100;
+            let positionFound = false;
+
+            while (!positionFound && attempts < maxAttempts) {
+                attempts++;
+
+                // Случайный угол для звездообразного расположения
+                angle = Math.random() * Math.PI * 2;
+
+                // Случайное расстояние от центра (от 250 до 400px)
+                const distance = 250 + Math.random() * 150;
+
+                // Центр контейнера
+                const centerX = 500;
+                const centerY = 400;
+
+                // Расчет позиции
+                x = centerX + Math.cos(angle) * distance - width/2;
+                y = centerY + Math.sin(angle) * distance - height/2;
+
+                // Проверка на пересечение с центральной карточкой
+                const centerCard = document.querySelector('.recipe-card');
+                const centerRect = centerCard.getBoundingClientRect();
+                const containerRect = container.getBoundingClientRect();
+
+                // Преобразование координат
+                const tileLeft = x;
+                const tileTop = y;
+                const tileRight = x + width;
+                const tileBottom = y + height;
+
+                const centerLeft = centerRect.left - containerRect.left;
+                const centerTop = centerRect.top - containerRect.top;
+                const centerRight = centerLeft + centerRect.width;
+                const centerBottom = centerTop + centerRect.height;
+
+                // Проверка пересечения
+                if (tileRight < centerLeft || tileLeft > centerRight || tileBottom < centerTop || tileTop > centerBottom) {
+                    // Проверка на пересечение с другими плитками
+                    let intersects = false;
+                    const tiles = document.querySelectorAll('.tile');
+
+                    for (let existingTile of tiles) {
+                        const existingRect = existingTile.getBoundingClientRect();
+                        const existingLeft = existingRect.left - containerRect.left;
+                        const existingTop = existingRect.top - containerRect.top;
+                        const existingRight = existingLeft + existingRect.width;
+                        const existingBottom = existingTop + existingRect.height;
+
+                        if (!(tileRight < existingLeft || tileLeft > existingRight || tileBottom < existingTop || tileTop > existingBottom)) {
+                            intersects = true;
+                            break;
+                        }
+                    }
+
+                    if (!intersects) {
+                        positionFound = true;
+                    }
+                }
+            }
+
+            if (!positionFound) {
+                // Если не удалось найти позицию, размещаем в случайном месте
+                x = 50 + Math.random() * (900 - width);
+                y = 50 + Math.random() * (700 - height);
+            }
+
+            // Случайный угол поворота (-15 до 15 градусов)
+            const rotation = -15 + Math.random() * 30;
+
+            // Установка стилей
+            tile.style.width = width + 'px';
+            tile.style.height = height + 'px';
+            tile.style.left = x + 'px';
+            tile.style.top = y + 'px';
+            tile.style.transform = 'rotate(' + rotation + 'deg)';
+
+            // Добавление содержимого
+            tile.innerHTML = `
+                <h3>Новая плитка ${tileCounter}</h3>
+                <p>Дополнительная информация может быть здесь...</p>
+            `;
+
+            container.appendChild(tile);
+        }
+
+        // Показать модальное окно скругления углов
+        function showRadiusModal() {
+            document.getElementById('radiusModal').style.display = 'flex';
+            const currentRadius = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--tile-radius').trim());
+            document.getElementById('radiusValue').value = parseInt(currentRadius);
+            document.getElementById('radiusValueDisplay').textContent = currentRadius;
+        }
+
+        // Изменить скругление углов
+        function changeRadius(value) {
+            document.documentElement.style.setProperty('--tile-radius', value + 'px');
+            document.getElementById('radiusValueDisplay').textContent = value + 'px';
+        }
+
+        // Показать модальное окно выбора паттерна
+        function showPatternModal() {
+            document.getElementById('patternModal').style.display = 'flex';
+        }
+
+        // Выбрать паттерн
+        function selectPattern(pattern) {
+            if (pattern === 'none') {
+                document.documentElement.style.setProperty('--bg-pattern', 'none');
+            } else {
+                document.documentElement.style.setProperty('--bg-pattern', pattern);
+            }
+        }
+
+        // Закрыть модальное окно
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        // Закрыть модальные окна при клике вне их
+        window.onclick = function(event) {
+            if (event.target.className === 'modal') {
+                event.target.style.display = 'none';
+            }
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            // Установка начального значения для радиуса
+            document.documentElement.style.setProperty('--tile-radius', '20px');
+        });
+    </script>
+</body>
+</html>
