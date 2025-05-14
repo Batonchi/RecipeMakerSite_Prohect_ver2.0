@@ -1,5 +1,4 @@
 from flask import Flask, render_template
-from flask_executor import Executor
 from app.base.constant import SECRET_KEY
 import os
 
@@ -12,24 +11,17 @@ def create_app():
 
     app.secret_key = SECRET_KEY
 
-    # Инициализация исполнителя для асинхронных задач
-    executor = Executor(app)
-    app.executor = executor
-
     # Импорт и регистрация blueprint'ов
     from app.web.auth.router import router as auth_router
     from app.web.recipes.router import router as recipes_router
-    from app.web.support.router import support_router
+    from app.web.support.router import router as support_router
 
-    app.register_blueprint(support_router)
     app.register_blueprint(auth_router)
     app.register_blueprint(recipes_router)
+    app.register_blueprint(support_router)
 
-    '''Глеб, for you'''
     @app.route('/', methods=['GET', 'POST'])
     def index():
-        return render_template('create_recipe_form.html', **{
-            'title': 'Создание Рецепта'
-        })
+        return render_template('create_recipe_form.html', title='Создание Рецепта')
 
     return app

@@ -1,121 +1,30 @@
 {% extends "base.html" %}
 
-{% block title %}Форма жалобы{% endblock %}
-
-{% block extra_css %}
-<style>
-    :root {
-        --primary-blue: #0d6efd;
-        --light-blue: #86b7fe;
-        --lavender: #e6e6fa;
-        --white: #ffffff;
-    }
-    
-    .complaint-container {
-        background-color: var(--white);
-        border-radius: 10px;
-        box-shadow: 0 0 15px rgba(13, 110, 253, 0.1);
-        padding: 2rem;
-        margin-top: 2rem;
-        border-top: 4px solid var(--primary-blue);
-    }
-    
-    .complaint-header {
-        color: var(--primary-blue);
-        border-bottom: 2px solid var(--lavender);
-        padding-bottom: 0.5rem;
-        margin-bottom: 1.5rem;
-    }
-    
-    .form-label {
-        color: var(--primary-blue);
-        font-weight: 500;
-    }
-    
-    .btn-primary {
-        background-color: var(--primary-blue);
-        border-color: var(--primary-blue);
-    }
-    
-    .btn-primary:hover {
-        background-color: #0b5ed7;
-        border-color: #0a58ca;
-    }
-    
-    .form-control:focus {
-        border-color: var(--light-blue);
-        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-    }
-    
-    .form-check-input:checked {
-        background-color: var(--primary-blue);
-        border-color: var(--primary-blue);
-    }
-    
-    .character-counter {
-        color: var(--light-blue);
-        font-size: 0.85rem;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="complaint-container">
-            <h2 class="complaint-header text-center mb-4">
-                <i class="bi bi-megaphone"></i> Форма обратной связи
-            </h2>
-            
-            <form method="POST" novalidate>
-                {{ form.hidden_tag() }}
-                
-                <div class="mb-4">
-                    {{ form.text.label(class="form-label") }}
-                    {{ form.text(class="form-control", rows=5, placeholder="Опишите вашу проблему подробно...") }}
-                    <div class="character-counter float-end">
-                        <span id="char-count">0</span>/500 символов
-                    </div>
-                    {% if form.text.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ form.text.errors[0] }}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Отправить жалобу</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        <div class="mb-3">
+                            {{ form.text.label(class="form-label") }}
+                            {{ form.text(class="form-control") }}
+                            {% for error in form.text.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
                         </div>
-                    {% endif %}
+                        <button type="submit" class="btn btn-primary">
+                            {{ form.submit.label }}
+                        </button>
+                    </form>
                 </div>
-                
-                {% if current_user.is_admin %}
-                <div class="mb-4 form-check form-switch">
-                    {{ form.is_solved(class="form-check-input") }}
-                    {{ form.is_solved.label(class="form-check-label") }}
-                </div>
-                {% endif %}
-                
-                <div class="d-grid gap-2">
-                    {{ form.submit(class="btn btn-primary btn-lg") }}
-                </div>
-            </form>
-        </div>
-        
-        <div class="text-center mt-4" style="color: var(--light-blue);">
-            <p>Мы рассмотрим вашу жалобу в ближайшее время</p>
+            </div>
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    // Счетчик символов
-    document.getElementById('text').addEventListener('input', function() {
-        const charCount = this.value.length;
-        document.getElementById('char-count').textContent = charCount;
-        
-        const counter = document.querySelector('.character-counter');
-        if (charCount > 450) {
-            counter.style.color = '#dc3545'; // Красный при приближении к лимиту
-        } else {
-            counter.style.color = '#86b7fe'; // Голубой
-        }
-    });
-</script>
 {% endblock %}

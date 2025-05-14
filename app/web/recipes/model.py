@@ -13,4 +13,4 @@ class Recipe(Base):
     name = Column(String, nullable=True)
     content = Column(JSON, default=None)
 
-    user = relationship('User', back_populates='recipes')
+    author = relationship('User', back_populates='recipes')

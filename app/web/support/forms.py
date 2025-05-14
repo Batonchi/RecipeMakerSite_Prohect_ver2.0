@@ -22,3 +22,14 @@ class ComplaintForm(FlaskForm):
                         ])
     is_solved = BooleanField('Проблема решена?', default=False)
     submit = SubmitField('Отправить жалобу')
+
+
+class BroadcastForm(FlaskForm):
+    subject = StringField('Тема рассылки',
+                         validators=[DataRequired()])
+    message = TextAreaField('Сообщение',
+                          validators=[
+                              DataRequired(),
+                              Length(min=10, max=2000)
+                          ])
+    submit = SubmitField('Отправить рассылку')

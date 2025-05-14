@@ -14,6 +14,7 @@ from app.support.model import Complaint
 from base.database import async_session_maker, engine
 from app.support.service import BankComplaintService
 
+
 app = FastAPI()
 app.mount('/static', StaticFiles(directory='app/view/static'))
 admin = Admin(app, engine, base_url="/admin",

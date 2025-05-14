@@ -18,9 +18,8 @@ class User(Base):
     is_admin = Column(Boolean, default=False)
 
     usertokens = relationship('UserToken', back_populates='user')
-    userrecipes = relationship('Recipe', back_populates='user')
+    recipes = relationship('Recipe', back_populates='author')
     complaints = relationship('Complaint', back_populates='user')
-
 
 
 class UserToken(Base):
