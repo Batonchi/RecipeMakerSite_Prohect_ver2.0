@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="1200" viewBox="0 0 800 1200" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <style type="text/css">
+        <![CDATA[
+        .background { fill: #ffffff; }
+        .text-bg { fill: rgba(255, 255, 255, 0.8); stroke: #545B81; stroke-width: 1; }
+        .title { font-size: 32px; font-weight: bold; fill: #545B81; font-family: Arial, sans-serif; }
+        .subtitle { font-size: 24px; font-weight: bold; fill: #686F95; font-family: Arial, sans-serif; }
+        .text { font-size: 16px; fill: #545B81; font-family: Arial, sans-serif; }
+        .hashtag { font-size: 14px; fill: #8F94B4; font-family: Arial, sans-serif; }
+        .decor-wave { stroke: #8F94B4; stroke-width: 2; fill: none; }
+        .decor-dot { fill: #686F95; }
+        .ingredient-name { font-weight: bold; }
+
+        /* Animation */
+        @keyframes wave {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-20px); }
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+        .wave-animation {
+            animation: wave 4s linear infinite;
+        }
+        .dot-animation {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        ]]>
+    </style>
+
+    <!-- Background -->
+    <rect class="background" width="100%" height="100%"/>
+
+    <!-- Decorative elements -->
+    <path class="decor-wave" d="M0,50 Q50,30 100,50 T200,50 T300,50 T400,50 T500,50 T600,50 T700,50 T800,50" />
+    <path class="decor-wave wave-animation" d="M0,150 Q50,130 100,150 T200,150 T300,150 T400,150 T500,150 T600,150 T700,150 T800,150" />
+    <path class="decor-wave" d="M0,250 Q50,270 100,250 T200,250 T300,250 T400,250 T500,250 T600,250 T700,250 T800,250" />
+
+    <circle class="decor-dot dot-animation" cx="50" cy="100" r="3" />
+    <circle class="decor-dot dot-animation" cx="150" cy="100" r="2" style="animation-delay: 0.5s" />
+    <circle class="decor-dot dot-animation" cx="250" cy="100" r="3" style="animation-delay: 1s" />
+    <circle class="decor-dot dot-animation" cx="350" cy="100" r="2" style="animation-delay: 1.5s" />
+    <circle class="decor-dot dot-animation" cx="450" cy="100" r="3" style="animation-delay: 2s" />
+
+    <!-- Title -->
+    <rect class="text-bg" x="40" y="180" width="720" height="60" rx="5" />
+    <text class="title" x="400" y="220" text-anchor="middle">{{ recipe_data.name }}</text>
+
+    <!-- Theme and Description -->
+    <rect class="text-bg" x="40" y="260" width="720" height="120" rx="5" />
+    <text class="subtitle" x="60" y="290">Тема: {{ recipe_data.content.theme }}</text>
+    <text class="text" x="60" y="320" width="680">{{ recipe_data.content.description }}</text>
+
+    <!-- Hashtags -->
+    <rect class="text-bg" x="40" y="400" width="720" height="40" rx="5" />
+    <text class="hashtag" x="60" y="425">
+        {% for tag in recipe_data.content.hashtags %}#{{ tag }} {% endfor %}
+    </text>
+
+    <!-- Ingredients -->
+    <rect class="text-bg" x="40" y="460" width="720" height="{{ 60 + recipe_data.content.ingredients|length * 30 }}" rx="5" />
+    <text class="subtitle" x="60" y="490">Ингредиенты:</text>
+    {% for ingredient in recipe_data.content.ingredients %}
+    <text class="text" x="80" y="{{ 520 + loop.index0 * 30 }}">
+        <tspan class="ingredient-name">{{ ingredient.number }}. {{ ingredient.name }}</tspan>
+        ({{ ingredient.quantity }}) - {{ ingredient.for_what }}
+    </text>
+    {% endfor %}
+
+    <!-- Steps -->
+    <rect class="text-bg" x="40" y="{{ 540 + recipe_data.content.ingredients|length * 30 }}" width="720" height="{{ 60 + recipe_data.content.steps|length * 90 }}" rx="5" />
+    <text class="subtitle" x="60" y="{{ 570 + recipe_data.content.ingredients|length * 30 }}">Шаги приготовления:</text>
+    {% for step in recipe_data.content.steps %}
+    <text class="text" x="80" y="{{ 600 + recipe_data.content.ingredients|length * 30 + loop.index0 * 90 }}" width="640">
+        <tspan x="80" dy="30" font-weight="bold">{{ step.number }}. {{ step.name }}</tspan>
+        <tspan x="80" dy="30">{{ step.description }}</tspan>
+        {% if step.explanations %}
+        <tspan x="80" dy="30" font-style="italic">Примечание: {{ step.explanations }}</tspan>
+        {% endif %}
+        {% if step.link %}
+        <tspan x="80" dy="30">Ссылка: <a xlink:href="{{ step.link }}">{{ step.link_description or step.link }}</a></tspan>
+        {% endif %}
+    </text>
+    {% endfor %}
+
+    <!-- Result -->
+    <rect class="text-bg" x="40" y="{{ 630 + recipe_data.content.ingredients|length * 30 + recipe_data.content.steps|length * 90 }}" width="720" height="120" rx="5" />
+    <text class="subtitle" x="60" y="{{ 660 + recipe_data.content.ingredients|length * 30 + recipe_data.content.steps|length * 90 }}">Результат:</text>
+    <text class="text" x="80" y="{{ 690 + recipe_data.content.ingredients|length * 30 + recipe_data.content.steps|length * 90 }}" width="640">{{ recipe_data.content.result }}</text>
+    {% if recipe_data.content.result_link %}
+    <text class="text" x="80" y="{{ 720 + recipe_data.content.ingredients|length * 30 + recipe_data.content.steps|length * 90 }}">
+        Ссылка: <a xlink:href="{{ recipe_data.content.result_link }}">{{ recipe_data.content.result_link_description or recipe_data.content.result_link }}</a>
+    </text>
+    {% endif %}
+
+    <!-- Color changer script -->
+    <script type="application/ecmascript">
+        <![CDATA[
+        function changeColorScheme(primary, secondary, accent, bg, text) {
+            document.querySelectorAll('.title, .text').forEach(el => el.setAttribute('fill', text || primary));
+            document.querySelectorAll('.subtitle').forEach(el => el.setAttribute('fill', secondary));
+            document.querySelectorAll('.hashtag').forEach(el => el.setAttribute('fill', accent));
+            document.querySelectorAll('.decor-wave').forEach(el => el.setAttribute('stroke', accent));
+            document.querySelectorAll('.decor-dot').forEach(el => el.setAttribute('fill', secondary));
+            document.querySelectorAll('.text-bg').forEach(el => {
+                el.setAttribute('stroke', primary);
+                el.setAttribute('fill', bg || 'rgba(255, 255, 255, 0.8)');
+            });
+            document.querySelector('.background').setAttribute('fill', bg || '#ffffff');
+        }
+
+        // Default colors
+        const colors = {
+            primary: '#545B81',
+            secondary: '#686F95',
+            accent: '#8F94B4',
+            bg: '#ffffff',
+            text: '#545B81'
+        };
+
+        // Apply colors from URL parameters if available
+        window.onload = function() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('color')) {
+                const colorPreset = params.get('color');
+                // You can define different color presets here
+                if (colorPreset === 'dark') {
+                    changeColorScheme('#686F95', '#8F94B4', '#A3A8C4', '#2D3250', '#FFFFFF');
+                } else if (colorPreset === 'warm') {
+                    changeColorScheme('#A37C5B', '#C49A6D', '#D4B58C', '#FFF9F0', '#5B3A21');
+                }
+                // Add more presets as needed
+            } else {
+                // Apply default colors
+                changeColorScheme(colors.primary, colors.secondary, colors.accent, colors.bg, colors.text);
+            }
+        };
+        ]]>
+    </script>
+</svg>

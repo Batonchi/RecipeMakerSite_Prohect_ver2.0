@@ -33,6 +33,53 @@ body::-webkit-scrollbar-thumb {
     border-radius: 40px;
 }
 
+ input[type^='text'] {
+     background-color: white;
+     font-weight: 700;
+     font-size: 18px;
+     font-family: inherit;
+     font-style: inherit;
+     min-height: 50px;
+     padding: 5px 15px;
+     border: none;
+     outline: none;
+ }
+
+textarea {
+    background-color: white;
+    font-weight: 700;
+    font-size: 18px;
+    font-family: inherit;
+    font-style: inherit;
+    min-height: 50px;
+    padding: 5px 15px;
+    border: none;
+    outline: none;
+}
+
+textarea::-webkit-scrollbar {
+    width: 10px;
+}
+
+textarea::-webkit-scrollbar-track {
+    background: #BABAD1;
+}
+
+textarea::-webkit-scrollbar-thumb {
+    background: #797f9f;
+    border-radius: 40px;
+}
+
+mark {
+    background: none;
+    color: #545B81;
+}
+
+.block--flex_column {
+    display: flex;
+    flex-direction: column;
+}
+
 .navigation {
     display: flex;
     flex-direction: row;
@@ -125,7 +172,7 @@ body::-webkit-scrollbar-thumb {
     padding-bottom: 20px;
 }
 
-.block--flex_row {
+.comment__form .block--flex_row {
     display: flex;
     flex-direction: row;
     width: 1200px;

@@ -1,0 +1,20 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Центр -->
+  <circle cx="400" cy="300" r="50" fill="#545B81"/>
+  <text x="400" y="305" font-size="14" fill="#FFFFFF" text-anchor="middle" font-family="Arial">project_name</text>
+
+  <!-- Левый блок: backend -->
+  <rect x="100" y="150" width="150" height="300" fill="#686F95" rx="10" ry="10"/>
+  <text x="175" y="170" font-size="14" fill="#FFFFFF" text-anchor="middle" font-family="Arial">backend</text>
+  <line x1="250" y1="300" x2="400" y2="300" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="4,2"/>
+
+  <!-- Правый блок: frontend -->
+  <rect x="550" y="150" width="150" height="300" fill="#686F95" rx="10" ry="10"/>
+  <text x="625" y="170" font-size="14" fill="#FFFFFF" text-anchor="middle" font-family="Arial">frontend</text>
+  <line x1="400" y1="300" x2="625" y2="170" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="4,2"/>
+
+  <!-- Нижний блок: docs, tests, etc. -->
+  <rect x="350" y="450" width="100" height="100" fill="#374967" rx="10" ry="10"/>
+  <text x="400" y="505" font-size="14" fill="#FFFFFF" text-anchor="middle" font-family="Arial">docs, tests</text>
+  <line x1="400" y1="300" x2="400" y2="500" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="4,2"/>
+</svg>

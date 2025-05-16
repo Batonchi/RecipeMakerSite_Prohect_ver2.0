@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrettyRecipeMaker - Recipe Form</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/graphic_form.css">
+</head>
+<body>
+    <header class="header">
+        <div class="logo">PrettyRecipeMaker</div>
+        <button id="clearBtn" class="step-btn">Clear</button>
+    </header>
+
+    <div class="main-container">
+        <div class="preview-container">
+            <div class="zoom-controls">
+                <button id="zoomInBtn" class="zoom-btn">+</button>
+                <button id="zoomOutBtn" class="zoom-btn">-</button>
+            </div>
+            <div class="preview-wrapper" id="previewWrapper">
+                <!-- Recipe preview will be rendered here -->
+            </div>
+        </div>
+
+        <div class="form-container">
+            <div class="step-navigation">
+                <button id="prevStepBtn" class="step-btn" disabled>Previous</button>
+                <button id="nextStepBtn" class="step-btn">Next</button>
+            </div>
+
+            <div class="step-indicator">
+                <div class="step-dot active" data-step="1"></div>
+                <div class="step-dot" data-step="2"></div>
+                <div class="step-dot" data-step="3"></div>
+                <div class="step-dot" data-step="4"></div>
+                <div class="step-dot" data-step="5"></div>
+                <div class="step-dot" data-step="6"></div>
+            </div>
+
+            <!-- Step 1: Add Blocks -->
+            <div class="step-content active" data-step="1">
+                <h2>Add Content Blocks</h2>
+                <div class="add-blocks-container">
+                    <div class="block-type" data-type="text">
+                        <h3>Text Block</h3>
+                        <p>Add custom text content</p>
+                    </div>
+                    <div class="block-type" data-type="image">
+                        <h3>Image Block</h3>
+                        <p>Add an image to your recipe</p>
+                    </div>
+                    <div class="block-type" data-type="ingredients">
+                        <h3>Ingredients List</h3>
+                        <p>Display recipe ingredients</p>
+                    </div>
+                    <div class="block-type" data-type="steps">
+                        <h3>Cooking Steps</h3>
+                        <p>Show preparation steps</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Layout -->
+            <div class="step-content" data-step="2">
+                <h2>Arrange Blocks</h2>
+                <div class="layout-options">
+                    <div class="layout-option" data-layout="circle">
+                        <h3>Circular</h3>
+                        <p>Arrange blocks in a circle</p>
+                    </div>
+                    <div class="layout-option" data-layout="grid">
+                        <h3>Grid</h3>
+                        <p>Arrange blocks in a grid</p>
+                    </div>
+                    <div class="layout-option" data-layout="spiral">
+                        <h3>Spiral</h3>
+                        <p>Arrange blocks in a spiral</p>
+                    </div>
+                    <div class="layout-option" data-layout="random">
+                        <h3>Random</h3>
+                        <p>Random arrangement</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Color Palette -->
+            <div class="step-content" data-step="3">
+                <h2>Choose Color Palette</h2>
+                <div class="color-palettes" id="colorPalettes">
+                    <!-- Palettes will be added dynamically -->
+                </div>
+            </div>
+
+            <!-- Step 4: Text Settings -->
+            <div class="step-content" data-step="4">
+                <div class="control-group">
+                    <h3>Font Settings</h3>
+                    <div class="form-group">
+                        <label for="fontFamily">Font Family:</label>
+                        <select id="fontFamily" class="form-input">
+                            <option value="Arial, sans-serif">Arial</option>
+                            <option value="'Times New Roman', serif">Times New Roman</option>
+                            <option value="'Courier New', monospace">Courier New</option>
+                            <option value="'Comic Sans MS', cursive">Comic Sans</option>
+                            <option value="Georgia, serif">Georgia</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="fontSize">Font Size: <span id="fontSizeValue">16px</span></label>
+                        <input type="range" id="fontSize" min="8" max="72" value="16" class="form-range">
+                    </div>
+                    <div class="form-group">
+                        <label for="fontWeight">Font Weight:</label>
+                        <select id="fontWeight" class="form-input">
+                            <option value="normal">Normal</option>
+                            <option value="bold">Bold</option>
+                            <option value="lighter">Light</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="fontColor">Font Color:</label>
+                        <input type="color" id="fontColor" value="#000000" class="form-color">
+                    </div>
+                    <div class="form-group form-checkbox">
+                        <input type="checkbox" id="italicCheckbox">
+                        <label for="italicCheckbox">Italic</label>
+                    </div>
+                    <div class="form-group form-checkbox">
+                        <input type="checkbox" id="underlineCheckbox">
+                        <label for="underlineCheckbox">Underline</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5: Resolution -->
+            <div class="step-content" data-step="5">
+                <h2>Select Resolution</h2>
+                <div class="resolution-options">
+                    <div class="resolution-option" data-resolution="800x600">
+                        <h3>800x600</h3>
+                        <p>Standard</p>
+                    </div>
+                    <div class="resolution-option" data-resolution="1024x768">
+                        <h3>1024x768</h3>
+                        <p>Medium</p>
+                    </div>
+                    <div class="resolution-option" data-resolution="1200x900">
+                        <h3>1200x900</h3>
+                        <p>Large</p>
+                    </div>
+                    <div class="resolution-option" data-resolution="custom">
+                        <h3>Custom</h3>
+                        <p>Set your own</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 6: Background -->
+            <div class="step-content" data-step="6">
+                <h2>Choose Background</h2>
+                <div class="background-options">
+                    <div class="background-option" data-bg="none" style="background-color: white;">
+                        <p>None</p>
+                    </div>
+                    <div class="background-option" data-bg="pattern1" style="background-image: linear-gradient(45deg, #f0f0f0 25%, transparent 25%, transparent 75%, #f0f0f0 75%, #f0f0f0), linear-gradient(45deg, #f0f0f0 25%, transparent 25%, transparent 75%, #f0f0f0 75%, #f0f0f0); background-position: 0 0, 10px 10px; background-size: 20px 20px;">
+                    </div>
+                    <div class="background-option" data-bg="pattern2" style="background-image: radial-gradient(circle, #f0f0f0 20%, transparent 20%); background-size: 30px 30px;">
+                    </div>
+                    <div class="background-option" data-bg="custom">
+                        <p>Custom</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Save options (shown only on last step) -->
+            <div class="save-options" id="saveOptions" style="display: none;">
+                <button id="saveHtmlBtn" class="save-btn">Save as HTML</button>
+                <button id="savePngBtn" class="save-btn">Save as PNG</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Context menu -->
+    <div class="context-menu" id="contextMenu">
+        <div class="context-menu-item" data-action="edit">Edit Block</div>
+        <div class="context-menu-item" data-action="delete">Delete Block</div>
+        <div class="context-menu-item" data-action="color">Change Color</div>
+        <div class="context-menu-item" data-action="rotate">Rotate</div>
+        <div class="context-menu-item" data-action="radius">Corner Radius</div>
+    </div>
+
+    <script src="/static/js/graphic_form.js"></script>
+</body>
+</html>

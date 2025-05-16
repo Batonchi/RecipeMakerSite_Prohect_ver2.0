@@ -17,109 +17,114 @@
         <div id="back_plus_waves">
             <div class="block--background" id="back">
                 <section class="fast--instruct section--bg_colour--border">
-                    <h2>Краткая инструкция</h2>
+                    <h2 class="header_2">Краткая инструкция</h2>
                     <div class="block--flex_column">
                         <div class="block--flex_row">
-                            <p>Это пространство сайта - форма, заполнив которую, вы получите свой красивый рецепт<p>
-                            <p>вы всегда можете нажать кнопку для использования нейросети для обработки текста или создания картинок,либо обработки<p>
+                            <p class="align_left">Это пространство сайта - <mark>форма</mark>, заполнив которую, вы получите свой <mark>красивый рецепт</mark><p>
+                            <p class="align_right">вы всегда можете нажать кнопку для использования <mark>нейросети</mark> для обработки текста или создания картинок, либо обработки<p>
                         </div>
                         <div class="block--flex_row">
-                            <p>ниже вам требуется заполнить 6 различных полей формы, которые могут включать обязательные и необязательные поля. они все  в какой-то степени обязательны.<p>
-                            <p>Формат в котором вы можете получить рецепт: pdf, html, png, jpeg<p>
+                            <p class="align_left">ниже вам <mark>требуется заполнить 6 различных полей формы</mark>, которые могут включать обязательные и необязательные поля. Они все в какой-то степени обязательны.<p>
+                            <p class="align_right">Формат в котором вы можете получить рецепт: <mark>pdf, html, png, jpeg</mark><p>
                         </div>
                     </div>
-                    <p>вы всегда можете приостановить процесс создания рецепта, либо уничтожить</p>
+                    <p class="close_text">вы всегда можете приостановить процесс создания рецепта, либо уничтожить</p>
                 </section>
-                <section class="main_form section--bg_colour--border">
-                    <h2></h2>
-                    <div class="block--flex_row">
-                        <label for="name">наименование</label>
-                        <input type="text" id="name">
+                <section class="main_form section--bg_colour--border block--flex_column">
+                    <h2 class="header_2">Форма</h2>
+                    <div class="grid_textarea_custom_label">
+                        <div class="label--bg_color border_top">наименование</div>
+                        <textarea type="text" id="name" class="input_name border_top no-resize textarea_form" required></textarea>
+                        <div class="border_bottom label--bg_color">тема</div>
+                        <textarea type="text" id="theme" class="input_theme border_bottom no-resize textarea_form" required></textarea>
+                        <div class="border_top label--bg_color">описание</div>
+                        <textarea id="description" class="input_description border_top no-resize textarea_form" required></textarea>
+                        <div class="border_bottom label--bg_color">хэштеги</div>
+                        <textarea id="hashtags" class="input_hashtags border_bottom no-resize textarea_form"></textarea>
                     </div>
-                    <div class="block--flex_row">
-                        <label for="theme">тема</label>
-                        <input type="text" id="theme">
-                    </div>
-                    <div class="block--flex_row">
-                        <label for="description">описание</label>
-                        <input type="text" id="description">
-                    </div>
-                    <div class="block--flex_row">
-                        <label for="hashtags">хэштеги</label>
-                        <input type="text" id="hashtags">
-                    </div>
-                    <button>выберите категорию рецепта</button>
+                    <button id="select_category" class="border_bottom select_category" type="button">выберите категорию рецепта</button>
                     <div class="ingredients block--flex_column">
-                        <h2></h2>
-                        <div class="ingredient block--flex_row">
-                            <label class="id_ing">1</label>
-                            <input type="text" id="name_ing" placeholder="">
-                            <input type="text" id="for_need" placeholder="">
-                            <input type="text" id="count" placeholder="">
-                            <label class="label__button--delete_ing">x</label>
-                        </div>
-                        <button>+</button>
-                    </div>
-                    <div class="steps">
-                        <div class="header__text">
-                            <h2></h2>
-                        </div>
-                        <div class="steps__elem">
-                            <div class="block--flex_row">
-                                <div class="block--flex_column">
-                                    <div class="block--flex_row">
-                                        <label></label>
-                                        <input type="text">
-                                        <label></label>
-                                        <input type="text">
-                                    </div>
-                                    <div class="block--flex_row">
-                                        <label></label>
-                                        <input type="text">
-                                    </div>
-                                    <div class="block--flex_row">
-                                        <label></label>
-                                        <input type="text">
-                                    </div>
-                                    <div class="step--add_graphic">
-                                        <div id="container_graph"></div>
-                                        <button>+</button>
-                                    </div>
-                                    <div class="step--add_links links--add">
-                                        <div class="container">
-                                            <input type="text" placeholder="">
-                                            <input type="text" placeholder="">
-                                        </div>
-                                        <div class="between_link_and_add"></div>
-                                        <button>+</button>
-                                    </div>
-                                </div>
-                                <button class="step__elem--del">+</button>
+                        <h2 class="header_2">Инградиенты</h2>
+                        <div class="block--flex_column" id="cont_ing">
+                            <div class="ingredient block--flex_row">
+                                <label class="id_ing">1</label>
+                                <input type="text" id="name_ing" class="style_font" placeholder="наименование">
+                                <input type="text" id="for_need" class="style_font" placeholder="для чего">
+                                <input type="text" id="count" class="style_font" placeholder="кол-во">
+                                <label class="label__button--delete_ing">x</label>
                             </div>
-                            <button>+</button>
+                        </div>
+
+                        <button class="plus_ing border_bottom">+</button>
+                    </div>
+                    <div class="steps border_top border_bottom">
+                        <div class="header__text border_top">
+                            <h2 class="header_2">Этапы</h2>
+                        </div>
+                        <div class="block--flex_column">
+                            <div class="steps__elem">
+                                <div class="block--flex_row">
+                                    <div class="block--flex_column">
+                                        <div class="grid_input_custom_label var_grid_1">
+                                            <div class="label_back border_bottom_right_top_left">имя</div>
+                                            <input type="text" class="border_bottom style_font limit_width_input" required>
+                                            <div class="border_bottom label_back">номер</div>
+                                            <input type="text" class="style_font border_top_right_bottom_left limit_width_input" required>
+                                        </div>
+                                        <div class="grid_input_custom_label var_grid_2">
+                                            <div class="label_back border_right">описание</div>
+                                            <textarea type="text" id="description" class="style_font border_left" required style="resize: none; border: none"></textarea>
+                                            <div class="label_back border_top_right_bottom_left">пояснение</div>
+                                            <textarea type="text" id="additional_info" class="style_font border_bottom_right_top_left" required style="resize: none; border: none"></textarea>
+                                        </div>
+                                        <div class="step--add_graphic border_top border_bottom">
+                                            <div id="container_graph" class="border_bottom border_top container">
+                                                выберите графическую состовляющею этапа
+                                            </div>
+                                            <button class="border_bottom button--add_images">+</button>
+                                        </div>
+                                        <div class="step--add_links links--add  border_bottom border_top">
+                                            <div class="container border_bottom border_top" id="step_links">
+                                                <input type="text" placeholder="куда ведет" class="where border_bottom border_top" required>
+                                                <input type="text" placeholder="ссылка" class="link_str border_bottom border_top" required>
+                                            </div>
+                                            <div class="between_link_and_add  border_bottom border_top">нажмите +, чтобы добавить ссылку</div>
+                                            <button class="add-button border_bottom">+</button>
+                                        </div>
+                                    </div>
+                                    <button class="step__elem--del">x</button>
+                                </div>
+                            </div>
+                            <button class="add-button border_bottom">+</button>
                         </div>
                     </div>
                     <div class="result">
-                        <div class="header__text">
-                            <h2></h2>
-                            <textarea placeholder=""></textarea>
+                        <div class="grid_result">
+                            <h2 class="header_2">Результат</h2>
+                            <textarea placeholder="напишите о том, что должно получится" class="result_textarea"></textarea>
                         </div>
                     </div>
-                    <div class="hyper_text links--add">
-                        <div class="container">
-                            <input type="text" placeholder="">
-                            <input type="text" placeholder="">
+                    <div class="hyper_text links--add  border_bottom border_top">
+                        <div class="container  border_bottom border_top" id="all_links">
+                            <input type="text" placeholder="куда ведет" class="where border_bottom border_top">
+                            <input type="text" placeholder="ссылка" class="link_str border_bottom border_top">
                         </div>
-                        <div class="between_link_and_add"></div>
-                        <button>+</button>
+                        <div class="between_link_and_add  border_bottom border_top">
+                            нажмите +, чтобы добавить ссылку
+                        </div>
+                        <button class="add-button border_bottom">+</button>
                     </div>
-                    <div class="block--flex_row">
-                        <input type="checkbox">
-                        <label></label>
+                    <div class="block--flex_row agree">
+                        <input type="checkbox" id="agree_neiro_for_photo" class="checkbox">
+                        <label for="agree_neiro_for_photo">использовать нейросети для генерации фото</label>
                     </div>
-                    <div class="block--flex_row">
-                        <input type="checkbox">
-                        <label></label>
+                    <div class="block--flex_row agree">
+                        <input type="checkbox" id="agree_neiro_for_text" class="checkbox">
+                        <label for="agree_neiro_for_text">использовать нейросети для проверки и улучшения текста</label>
+                    </div>
+                    <div class="grid_main_buttons">
+                        <button id="cancel" class="cancel_button border_bottom main_button">отменить</button>
+                        <button id="ok" class="confirm_button border_bottom main_button">принять</button>
                     </div>
                 </section>
             </div>
@@ -152,7 +157,9 @@
                     console.log(`width: ${width} height: ${height}`)
                 }
             });
-
+            document.querySelector('footer').addEventListener('click', (event) => {
+                document.getElementById('back').style.height = '10000px'
+            })
             document.addEventListener('DOMContentLoaded', (event) => {
                 observer.observe(document.getElementById('back'));
             });

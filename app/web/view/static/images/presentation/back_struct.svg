@@ -1,0 +1,20 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Центр -->
+  <circle cx="400" cy="300" r="50" fill="#545B81"/>
+  <text x="400" y="305" font-size="14" fill="#FFFFFF" text-anchor="middle" font-family="Arial">backend</text>
+
+  <!-- app -->
+  <rect x="150" y="150" width="150" height="100" fill="#686F95" rx="10" ry="10"/>
+  <text x="225" y="180" font-size="12" fill="#FFFFFF" text-anchor="middle" font-family="Arial">app</text>
+  <line x1="400" y1="300" x2="225" y2="200" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="4,2"/>
+
+  <!-- base -->
+  <rect x="150" y="300" width="150" height="100" fill="#686F95" rx="10" ry="10"/>
+  <text x="225" y="330" font-size="12" fill="#FFFFFF" text-anchor="middle" font-family="Arial">base</text>
+  <line x1="400" y1="300" x2="225" y2="350" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="4,2"/>
+
+  <!-- migrations -->
+  <rect x="150" y="450" width="150" height="100" fill="#686F95" rx="10" ry="10"/>
+  <text x="225" y="480" font-size="12" fill="#FFFFFF" text-anchor="middle" font-family="Arial">migrations</text>
+  <line x1="400" y1="300" x2="225" y2="500" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="4,2"/>
+</svg>
