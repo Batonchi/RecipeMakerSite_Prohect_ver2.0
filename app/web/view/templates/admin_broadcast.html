@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Админка - Рассылка{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Создать рассылку</h2>
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                
+                <div class="mb-3">
+                    {{ form.subject.label(class="form-label") }}
+                    {{ form.subject(class="form-control") }}
+                    {% if form.subject.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.subject.errors[0] }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    {{ form.message.label(class="form-label") }}
+                    {{ form.message(class="form-control", rows=10) }}
+                    {% if form.message.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.message.errors[0] }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Отправить рассылку</button>
+                <a href="{{ url_for('support.admin_complaints') }}" class="btn btn-secondary">Отмена</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

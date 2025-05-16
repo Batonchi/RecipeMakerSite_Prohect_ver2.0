@@ -15,7 +15,10 @@ def create_app():
     from app.web.auth.router import router as auth_router
     from app.web.recipes.router import router as recipes_router
     from app.web.support.router import router as support_router
+    from app.web.admin.router import router as admin_router
 
+
+    app.register_blueprint(admin_router)
     app.register_blueprint(auth_router)
     app.register_blueprint(recipes_router)
     app.register_blueprint(support_router)

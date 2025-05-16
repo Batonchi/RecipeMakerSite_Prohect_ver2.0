@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Админка - Жалобы{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Управление жалобами</h2>
+    
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title">Статистика</h5>
+                    <p>Всего жалоб: {{ total_complaints }}</p>
+                    <p>Решено: {{ solved_complaints }}</p>
+                    <p>Не решено: {{ unsolved_complaints }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <a href="{{ url_for('support.admin_broadcast') }}" class="btn btn-primary">
+                Создать рассылку
+            </a>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">
+            <h4>Нерешенные жалобы</h4>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Пользователь</th>
+                        <th>Текст жалобы</th>
+                        <th>Дата</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for complaint in complaints %}
+                    <tr>
+                        <td>{{ complaint.id }}</td>
+                        <td>{{ complaint.user_id }}</td>
+                        <td>{{ complaint.text[:50] }}...</td>
+                        <td>{{ complaint.date_pushed.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>
+                            <a href="{{ url_for('support.solve_complaint', complaint_id=complaint.id) }}" 
+                               class="btn btn-sm btn-success" 
+                               onclick="return confirm('Пометить как решенную?')">
+                                Решено
+                            </a>
+                            <a href="#" class="btn btn-sm btn-info">Ответить</a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center">Нет нерешенных жалоб</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

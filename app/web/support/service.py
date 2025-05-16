@@ -3,8 +3,26 @@ from app.base.database import async_session_maker
 from app.web.support.model import Complaint
 from sqlalchemy import select, func
 
+
 class ComplaintService(BaseService):
     model = Complaint
+
+    from app.base.service import BaseService
+    from app.base.database import async_session_maker
+    from app.web.support.model import Complaint
+    from sqlalchemy import select, func
+
+    class ComplaintService(BaseService):
+        model = Complaint
+
+        @classmethod
+        async def insert(cls, **data):
+            async with async_session_maker() as session:
+                complaint = cls.model(**data)
+                session.add(complaint)
+                await session.commit()
+                await session.refresh(complaint)
+                return complaint
 
     @classmethod
     async def get_user_complaints(cls, user_id):
@@ -23,19 +41,20 @@ class ComplaintService(BaseService):
             result = await session.execute(query)
             return result.scalar()
 
-    @classmethod
-    def insert_sync(cls, **data):
-        with cls.session_maker() as session:
-            session.add(cls.model(**data))
-            session.commit()
 
 class BroadcastService:
     @classmethod
     async def send_broadcast(cls, subject, message):
-        from app.web.users.service import UserService  # Ленивый импорт
+        from app.web.users.service import UserService
+        from app.base.mail import send_email  # Импортируем функцию отправки email
+
         async with async_session_maker() as session:
             users = await UserService.get_all()
             for user in users:
-                # Реализация рассылки
-                pass
+                if user.email:  # Отправляем только если есть email
+                    await send_email(
+                        to=user.email,
+                        subject=subject,
+                        body=message
+                    )
         return True

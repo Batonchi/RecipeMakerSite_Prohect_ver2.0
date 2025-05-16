@@ -25,23 +25,6 @@ def login_required(f):
     return wrapper
 
 
-# Декоратор для проверки прав администратора
-def admin_required(f):
-    def wrapper(*args, **kwargs):
-
-        """ Надо будет переделать """
-
-        # Здесь нужно добавить проверку, что пользователь админ
-        # Можно хранить is_admin в зашифрованном виде в токене или делать запрос к БД
-        is_admin = False
-        if not is_admin:
-            flash('Недостаточно прав для этого действия', 'danger')
-            return redirect('/')
-        return f(*args, **kwargs)
-
-    return wrapper
-
-
 # Логин
 @router.route('/login', methods=['GET'])
 async def login_page():
@@ -77,12 +60,10 @@ async def login_handler():
                 response.set_cookie('user_id', str(user.id))
                 response.set_cookie('is_admin', str(int(user.is_admin)))
 
-                flash("Вы успешно вошли в систему!", 'success')
+                await session.close()
                 return response
-
     except Exception as e:
         print(f"Login error: {e}")
-        flash("Произошла ошибка при входе.", 'danger')
         return render_template('login.html', form=form)
 
 

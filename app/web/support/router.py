@@ -2,14 +2,14 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from sqlalchemy import desc, select, update
 from functools import wraps
 import asyncio
-
-router = Blueprint('support', __name__, url_prefix='/support')
-
+import datetime
 from app.web.support.forms import ComplaintForm, BroadcastForm
 from app.web.support.service import ComplaintService, BroadcastService
 from app.web.support.model import Complaint
 from app.base.database import async_session_maker
+from app.web.users.model import User
 
+router = Blueprint('support', __name__, url_prefix='/support')
 
 
 # Декоратор для асинхронных функций
@@ -60,60 +60,68 @@ async def create_complaint():
     form = ComplaintForm()
     if form.validate_on_submit():
         try:
-            complaint_data = {
-                'user_id': request.cookies.get('user_id'),
-                'text': form.text.data,
-                'is_solved': False
-            }
-            await ComplaintService.insert(**complaint_data)
-            flash('Ваша жалоба успешно отправлена!', 'success')
-            return redirect('/')
+            user_id = request.cookies.get('user_id')
+            if not user_id:
+                flash('Не удалось определить пользователя', 'danger')
+                return redirect('recipe/auth/login')
+
+            # Создаем новую сессию для проверки пользователя
+            async with async_session_maker() as session:
+                # Проверяем существование пользователя
+                user_exists = await session.execute(
+                    select(User).where(User.id == int(user_id)))
+                if not user_exists.scalar():
+                    flash('Пользователь не найден', 'danger')
+                    return redirect('recipe/auth/login')
+                # Закрываем текущую сессию перед созданием новой
+                await session.close()
+
+                # Создаем данные для жалобы
+                complaint_data = {
+                    'user_id': int(user_id),
+                    'text': form.text.data,
+                    'is_solved': form.is_solved.data,
+                    'date_pushed': datetime.datetime.now()
+                }
+
+                # Используем отдельную сессию для вставки
+                await ComplaintService.insert(**complaint_data)
+
+                flash('Ваша жалоба успешно отправлена!', 'success')
+                return redirect('/recipe')
+
+        except ValueError as e:
+            flash(f'Ошибка в данных: {str(e)}', 'danger')
         except Exception as e:
             flash(f'Ошибка при отправке жалобы: {str(e)}', 'danger')
-    return await render_template('support.html', form=form)
+
+    return render_template('support.html', form=form)
 
 
-@router.route('/complaints', methods=['GET'])
-@async_route
-@login_required
-async def complaints_list():
-    user_id = request.cookies.get('user_id')
-    is_admin = request.cookies.get('is_admin') == '1'
-
-    if is_admin:
-        async with async_session_maker() as session_db:
-            query = select(Complaint).order_by(desc(Complaint.date_pushed))
-            result = await session_db.execute(query)
-            complaints = result.scalars().all()
-    else:
-        async with async_session_maker() as session_db:
-            query = select(Complaint).where(
-                Complaint.user_id == user_id
-            ).order_by(desc(Complaint.date_pushed))
-            result = await session_db.execute(query)
-            complaints = result.scalars().all()
-
-    return await render_template('complaints_list.html',
-                                 complaints=complaints,
-                                 is_admin=is_admin)
-
-
-@router.route('/complaints/<int:complaint_id>/solve', methods=['POST'])
+@router.route('/admin/complaints')
 @async_route
 @login_required
 @admin_required
-async def solve_complaint(complaint_id):
-    try:
-        async with async_session_maker() as session_db:
-            query = update(Complaint).where(
-                Complaint.id == complaint_id
-            ).values(is_solved=True)
-            await session_db.execute(query)
-            await session_db.commit()
-        flash('Жалоба отмечена как решенная', 'success')
-    except Exception as e:
-        flash(f'Ошибка при обновлении жалобы: {str(e)}', 'danger')
-    return redirect('recipe/support/complaints_list')
+async def admin_complaints():
+    async with async_session_maker() as session:
+        # Получаем только нерешенные жалобы
+        query = select(Complaint).where(
+            Complaint.is_solved == False
+        ).order_by(desc(Complaint.date_pushed))
+
+        result = await session.execute(query)
+        complaints = result.scalars().all()
+
+        # Получаем статистику
+        total = await ComplaintService.get_count()
+        solved = await ComplaintService.get_count(is_solved=True)
+        unsolved = await ComplaintService.get_count(is_solved=False)
+
+        return render_template('admin_complaints.html',
+                               complaints=complaints,
+                               total_complaints=total,
+                               solved_complaints=solved,
+                               unsolved_complaints=unsolved)
 
 
 @router.route('/admin/broadcast', methods=['GET', 'POST'])
@@ -124,33 +132,15 @@ async def admin_broadcast():
     form = BroadcastForm()
     if form.validate_on_submit():
         try:
-            await BroadcastService.send_broadcast(
+            success = await BroadcastService.send_broadcast(
                 subject=form.subject.data,
                 message=form.message.data
             )
-            flash('Рассылка успешно отправлена!', 'success')
-            return redirect(url_for('support.admin_dashboard'))
+            if success:
+                flash('Рассылка успешно отправлена!', 'success')
+            else:
+                flash('Произошла ошибка при отправке', 'warning')
+            return redirect(url_for('support.admin_complaints'))
         except Exception as e:
             flash(f'Ошибка при отправке рассылки: {str(e)}', 'danger')
-    return await render_template('admin_broadcast.html', form=form)
-
-
-@router.route('/admin/dashboard')
-@async_route
-@login_required
-@admin_required
-async def admin_dashboard():
-    async with async_session_maker() as session_db:
-        total = await ComplaintService.get_count()
-        solved = await ComplaintService.get_count(is_solved=True)
-        unsolved = await ComplaintService.get_count(is_solved=False)
-
-        query = select(Complaint).order_by(desc(Complaint.date_pushed)).limit(5)
-        result = await session_db.execute(query)
-        recent_complaints = result.scalars().all()
-
-    return await render_template('admin_dashboard.html',
-                                 total_complaints=total,
-                                 solved_complaints=solved,
-                                 unsolved_complaints=unsolved,
-                                 recent_complaints=recent_complaints)
+    return render_template('admin_broadcast.html', form=form)
