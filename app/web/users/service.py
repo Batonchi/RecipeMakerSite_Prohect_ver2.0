@@ -1,6 +1,6 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.web.users.model import User
+from app.web.users.model import User, Guest
 from app.base.service import BaseService
 
 
@@ -15,13 +15,17 @@ class UserService(BaseService):
         return result.scalar_one_or_none()
 
     @classmethod
-    async def insert(cls, session: AsyncSession, **data):
-        """Асинхронно создает нового пользователя"""
-        new_user = cls.model(**data)
-        session.add(new_user)
-        await session.flush()
-        await session.refresh(new_user)
-        return new_user
+    async def insert(cls, session, **data):
+        try:
+            user = cls.model(**data)
+            session.add(user)
+            await session.commit()
+            await session.refresh(user)
+            return user
+        except Exception as e:
+            print(f"Ошибка при создании пользователя: {str(e)}")
+            await session.rollback()
+            raise
 
     @classmethod
     async def update(cls, session: AsyncSession, user_id: int, **data):
@@ -39,3 +43,9 @@ class UserService(BaseService):
         user = await cls.get_one_or_none(session, id=user_id)
         if user:
             await session.delete(user)
+
+
+class GuestService(BaseService):
+    """Здесь планируются какие-то методы"""
+    model = Guest
+

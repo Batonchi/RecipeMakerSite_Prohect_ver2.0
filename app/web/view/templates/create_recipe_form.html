@@ -132,29 +132,30 @@
                                                 </button>
                                             </div>
                                             <div class="step--add_links links--add border_bottom border_top">
-                                                <div class="container border_bottom border_top" id="step_links">
+                                            <div class="container border_bottom border_top" id="step_links">
+                                                {% for link in step.links %}
                                                     <div class="link">
                                                         <input type="text"
-                                                               name="{{ step.link_description.name }}"
+                                                               name="{{ link.link_description.name }}"
                                                                placeholder="куда ведет"
                                                                class="where border_bottom border_top"
                                                                required
-                                                               value="{{ step.link_description.data or '' }}">
+                                                               value="{{ link.link_description.data or '' }}">
                                                         <input type="text"
-                                                               name="{{ step.link.name }}"
+                                                               name="{{ link.link.name }}"
                                                                placeholder="ссылка"
                                                                class="link_str border_bottom border_top"
                                                                required
-                                                               value="{{ step.link.data or '' }}">
+                                                               value="{{ link.link.data or '' }}">
                                                         <label class="label__button--delete_link">x</label>
                                                     </div>
-                                                </div>
-                                                <div class="between_link_and_add border_bottom border_top">нажмите +,
-                                                    чтобы
-                                                    добавить ссылку
-                                                </div>
-                                                <button class="add--step_link__button border_bottom" type="button">+</button>
+                                                {% endfor %}
                                             </div>
+                                            <div class="between_link_and_add border_bottom border_top">
+                                                нажмите +, чтобы добавить ссылку
+                                            </div>
+                                            <button class="add--step_link__button border_bottom" type="button">+</button>
+                                        </div>
                                         </div>
                                         <button class="step__elem--del" type="button">x</button>
                                     </div>
