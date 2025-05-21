@@ -18,7 +18,7 @@ app.register_blueprint(recipes_router)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    return render_template('create_recipe_form.html', **{'title': 'ui'})
+    return 'hi'
 
 
 if __name__ == '__main__':

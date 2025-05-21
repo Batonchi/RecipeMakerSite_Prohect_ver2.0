@@ -7,9 +7,12 @@ from app.web.main import app as web_app_init
 # from app.bots.main import app as bot_app
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 import asyncio
+import os
 
-
-main_app = Flask(__name__)
+main_app = Flask(__name__,
+                 static_url_path='/static',
+                 static_folder=os.path.abspath('app/web/view/static'),
+                 template_folder=os.path.abspath('app/web/view/templates'))
 api = Api(main_app)
 
 

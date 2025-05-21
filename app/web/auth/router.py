@@ -5,11 +5,11 @@ from app.web.auth.forms import LoginForm, RegisterForm
 from app.web.auth.service import create_token, hash_password
 from app.web.users.service import UserService
 
-
 router = flask.Blueprint('auth', __name__,
                          url_prefix='/auth',
                          static_folder='..web/view/static',
                          template_folder='..web/view/')
+
 
 @router.get('/login')
 async def login_page():
@@ -48,7 +48,7 @@ async def logout():
 
 @router.get('/register')
 async def register_page():
-    return render_template('reg.html', form=RegisterForm())
+    return render_template('new_registration.html', form=RegisterForm())
 
 
 @router.post('/register')
@@ -74,4 +74,3 @@ async def register():
         print(e)
         raise HTTPException(status_code=409)
     return redirect('/auth/login')
-

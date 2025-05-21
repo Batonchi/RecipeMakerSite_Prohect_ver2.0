@@ -13,157 +13,233 @@
     {% endblock self_links %}
 </head>
 <body>
-    {% block main_content %}
-        <div id="back_plus_waves">
-            <div class="block--background" id="back">
-                <section class="fast--instruct section--bg_colour--border">
-                    <h2 class="header_2">Краткая инструкция</h2>
-                    <div class="block--flex_column">
-                        <div class="block--flex_row">
-                            <p class="align_left">Это пространство сайта - <mark>форма</mark>, заполнив которую, вы получите свой <mark>красивый рецепт</mark><p>
-                            <p class="align_right">вы всегда можете нажать кнопку для использования <mark>нейросети</mark> для обработки текста или создания картинок, либо обработки<p>
-                        </div>
-                        <div class="block--flex_row">
-                            <p class="align_left">ниже вам <mark>требуется заполнить 6 различных полей формы</mark>, которые могут включать обязательные и необязательные поля. Они все в какой-то степени обязательны.<p>
-                            <p class="align_right">Формат в котором вы можете получить рецепт: <mark>pdf, html, png, jpeg</mark><p>
-                        </div>
+{% block main_content %}
+    <div id="back_plus_waves">
+        <div class="block--background" id="back">
+            <section class="fast--instruct section--bg_colour--border">
+                <h2 class="header_2">Краткая инструкция</h2>
+                <div class="block--flex_column">
+                    <div class="block--flex_row">
+                        <p class="align_left">Это пространство сайта -
+                            <mark>форма</mark>
+                            , заполнив которую, вы получите свой
+                            <mark>красивый рецепт</mark>
+                        <p>
+                        <p class="align_right">вы всегда можете нажать кнопку для использования
+                            <mark>нейросети</mark>
+                            для обработки текста или создания картинок, либо обработки
+                        <p>
                     </div>
-                    <p class="close_text">вы всегда можете приостановить процесс создания рецепта, либо уничтожить</p>
-                </section>
-                <section class="main_form section--bg_colour--border block--flex_column">
-                    <h2 class="header_2">Форма</h2>
-                    <div class="grid_textarea_custom_label">
-                        <div class="label--bg_color border_top">наименование</div>
-                        <textarea type="text" id="name" class="input_name border_top no-resize textarea_form" required></textarea>
-                        <div class="border_bottom label--bg_color">тема</div>
-                        <textarea type="text" id="theme" class="input_theme border_bottom no-resize textarea_form" required></textarea>
-                        <div class="border_top label--bg_color">описание</div>
-                        <textarea id="description" class="input_description border_top no-resize textarea_form" required></textarea>
-                        <div class="border_bottom label--bg_color">хэштеги</div>
-                        <textarea id="hashtags" class="input_hashtags border_bottom no-resize textarea_form"></textarea>
+                    <div class="block--flex_row">
+                        <p class="align_left">ниже вам
+                            <mark>требуется заполнить 6 различных полей формы</mark>
+                            , которые могут включать обязательные и необязательные поля. Они все в какой-то степени
+                            обязательны.
+                        <p>
+                        <p class="align_right">Формат в котором вы можете получить рецепт:
+                            <mark>pdf, html, png, jpeg</mark>
+                        <p>
                     </div>
-                    <button id="select_category" class="border_bottom select_category" type="button">выберите категорию рецепта</button>
-                    <div class="ingredients block--flex_column">
-                        <h2 class="header_2">Инградиенты</h2>
-                        <div class="block--flex_column" id="cont_ing">
+                </div>
+                <p class="close_text">вы всегда можете приостановить процесс создания рецепта, либо уничтожить</p>
+            </section>
+            <form method="POST" enctype="multipart/form-data"
+                  class="main_form section--bg_colour--border block--flex_column">
+                {{ form.hidden_tag() }}
+                <h2 class="header_2">Форма</h2>
+                <div class="grid_textarea_custom_label">
+                    <div class="label--bg_color border_top">наименование</div>
+                    {{ form.name(class="input_name border_top no-resize textarea_form", required="required") }}
+                    <div class="border_bottom label--bg_color">тема</div>
+                    {{ form.theme(class="input_theme border_bottom no-resize textarea_form", required="required") }}
+                    <div class="border_top label--bg_color">описание</div>
+                    {{ form.description(class="input_description border_top no-resize textarea_form", required="required") }}
+                    <div class="border_bottom label--bg_color">хэштеги</div>
+                    {{ form.hashtags(class="input_hashtags border_bottom no-resize textarea_form") }}
+                </div>
+                <label class="select_category border_top" type="header">выберите категорию рецепта</label>
+                {{ form.categories(class="d-none select_category select_category_option border_bottom") }}
+                <div class="ingredients block--flex_column">
+                    <h2 class="header_2">Ингредиенты</h2>
+                    <div class="block--flex_column" id="cont_ing">
+                        {% for ingredient in form.ingredients %}
                             <div class="ingredient block--flex_row">
-                                <label class="id_ing">1</label>
-                                <input type="text" id="name_ing" class="style_font" placeholder="наименование">
-                                <input type="text" id="for_need" class="style_font" placeholder="для чего">
-                                <input type="text" id="count" class="style_font" placeholder="кол-во">
+                                <label class="id_ing">{{ loop.index }}</label>
+                                <input type="text"
+                                       name="{{ ingredient.name.name }}"
+                                       class="style_font"
+                                       placeholder="наименование"
+                                       value="{{ ingredient.name.data or '' }}">
+                                <input type="text"
+                                       name="{{ ingredient.for_what.name }}"
+                                       class="style_font"
+                                       placeholder="для чего"
+                                       value="{{ ingredient.for_what.data or '' }}">
+                                <input type="text"
+                                       name="{{ ingredient.quantity.name }}"
+                                       class="style_font"
+                                       placeholder="кол-во"
+                                       value="{{ ingredient.quantity.data or '' }}">
                                 <label class="label__button--delete_ing">x</label>
                             </div>
-                        </div>
-
-                        <button class="plus_ing border_bottom">+</button>
+                        {% endfor %}
                     </div>
-                    <div class="steps border_top border_bottom">
-                        <div class="header__text border_top">
-                            <h2 class="header_2">Этапы</h2>
-                        </div>
-                        <div class="block--flex_column">
-                            <div class="steps__elem">
-                                <div class="block--flex_row">
-                                    <div class="block--flex_column">
-                                        <div class="grid_input_custom_label var_grid_1">
-                                            <div class="label_back border_bottom_right_top_left">имя</div>
-                                            <input type="text" class="border_bottom style_font limit_width_input" required>
-                                            <div class="border_bottom label_back">номер</div>
-                                            <input type="text" class="style_font border_top_right_bottom_left limit_width_input" required>
-                                        </div>
-                                        <div class="grid_input_custom_label var_grid_2">
-                                            <div class="label_back border_right">описание</div>
-                                            <textarea type="text" id="description" class="style_font border_left" required style="resize: none; border: none"></textarea>
-                                            <div class="label_back border_top_right_bottom_left">пояснение</div>
-                                            <textarea type="text" id="additional_info" class="style_font border_bottom_right_top_left" required style="resize: none; border: none"></textarea>
-                                        </div>
-                                        <div class="step--add_graphic border_top border_bottom">
-                                            <div id="container_graph" class="border_bottom border_top container">
-                                                выберите графическую состовляющею этапа
+                    <button class="plus_ing border_bottom" type="button">+</button>
+                </div>
+
+                <div class="steps border_top border_bottom">
+                    <div class="header__text border_top">
+                        <h2 class="header_2">Этапы</h2>
+                    </div>
+                    <div class="block--flex_column">
+                        {% for step in form.steps %}
+                            <div class="container">
+                                <div class="steps__elem">
+                                    <div class="block--flex_row">
+                                        <div class="block--flex_column">
+                                            <div class="grid_input_custom_label var_grid_1">
+                                                <div class="label_back border_bottom_right_top_left">имя</div>
+                                                <input type="text"
+                                                       name="{{ step.name.name }}"
+                                                       class="border_bottom style_font limit_width_input"
+                                                       required
+                                                       value="{{ step.name.data or '' }}">
+                                                <div class="border_bottom label_back">номер</div>
+                                                <input type="text"
+                                                       name="{{ step.number.name }}"
+                                                       class="style_font border_top_right_bottom_left limit_width_input"
+                                                       required
+                                                       value="{{ step.number.data or '' }}">
                                             </div>
-                                            <button class="border_bottom button--add_images">+</button>
-                                        </div>
-                                        <div class="step--add_links links--add  border_bottom border_top">
-                                            <div class="container border_bottom border_top" id="step_links">
-                                                <input type="text" placeholder="куда ведет" class="where border_bottom border_top" required>
-                                                <input type="text" placeholder="ссылка" class="link_str border_bottom border_top" required>
+                                            <div class="grid_input_custom_label var_grid_2">
+                                                <div class="label_back border_right">описание</div>
+                                                <textarea name="{{ step.description.name }}"
+                                                          class="style_font border_left"
+                                                          required
+                                                          style="resize: none; border: none">{{ step.description.data or '' }}</textarea>
+                                                <div class="label_back border_top_right_bottom_left">пояснение</div>
+                                                <textarea name="{{ step.explanations.name }}"
+                                                          class="style_font border_bottom_right_top_left"
+                                                          required
+                                                          style="resize: none; border: none">{{ step.explanations.data or '' }}</textarea>
                                             </div>
-                                            <div class="between_link_and_add  border_bottom border_top">нажмите +, чтобы добавить ссылку</div>
-                                            <button class="add-button border_bottom">+</button>
+                                            <div class="step--add_graphic border_top border_bottom">
+                                                <div class="border_bottom border_top container">
+                                                    выберите графическую составляющую этапа
+                                                    <div id="container_graph"></div>
+                                                </div>
+                                                <button class="border_bottom button--add_images" type="button">+
+                                                </button>
+                                            </div>
+                                            <div class="step--add_links links--add border_bottom border_top">
+                                                <div class="container border_bottom border_top" id="step_links">
+                                                    <div class="link">
+                                                        <input type="text"
+                                                               name="{{ step.link_description.name }}"
+                                                               placeholder="куда ведет"
+                                                               class="where border_bottom border_top"
+                                                               required
+                                                               value="{{ step.link_description.data or '' }}">
+                                                        <input type="text"
+                                                               name="{{ step.link.name }}"
+                                                               placeholder="ссылка"
+                                                               class="link_str border_bottom border_top"
+                                                               required
+                                                               value="{{ step.link.data or '' }}">
+                                                        <label class="label__button--delete_link">x</label>
+                                                    </div>
+                                                </div>
+                                                <div class="between_link_and_add border_bottom border_top">нажмите +,
+                                                    чтобы
+                                                    добавить ссылку
+                                                </div>
+                                                <button class="add--step_link__button border_bottom" type="button">+</button>
+                                            </div>
                                         </div>
+                                        <button class="step__elem--del" type="button">x</button>
                                     </div>
-                                    <button class="step__elem--del">x</button>
                                 </div>
                             </div>
-                            <button class="add-button border_bottom">+</button>
+                        {% endfor %}
+                        <button class="add-button border_bottom" type="button">+</button>
+                    </div>
+                </div>
+                <div class="result">
+                    <div class="grid_result">
+                        <h2 class="header_2">Результат</h2>
+                        {{ form.result(placeholder="напишите о том, что должно получится", class="result_textarea") }}
+                    </div>
+                </div>
+                <div class="hyper_text links--add border_bottom border_top">
+                    <div class="container border_bottom border_top" id="all_links">
+                        <div class="link">
+                            {{ form.result_link_description(placeholder="куда ведет", class="where border_bottom border_top") }}
+                            {{ form.result_link(placeholder="ссылка", class="link_str border_bottom border_top") }}
+                            <label class="label__button--delete_link">x</label>
                         </div>
+
                     </div>
-                    <div class="result">
-                        <div class="grid_result">
-                            <h2 class="header_2">Результат</h2>
-                            <textarea placeholder="напишите о том, что должно получится" class="result_textarea"></textarea>
-                        </div>
+                    <div class="between_link_and_add border_bottom border_top">
+                        нажмите +, чтобы добавить ссылку
                     </div>
-                    <div class="hyper_text links--add  border_bottom border_top">
-                        <div class="container  border_bottom border_top" id="all_links">
-                            <input type="text" placeholder="куда ведет" class="where border_bottom border_top">
-                            <input type="text" placeholder="ссылка" class="link_str border_bottom border_top">
-                        </div>
-                        <div class="between_link_and_add  border_bottom border_top">
-                            нажмите +, чтобы добавить ссылку
-                        </div>
-                        <button class="add-button border_bottom">+</button>
-                    </div>
-                    <div class="block--flex_row agree">
-                        <input type="checkbox" id="agree_neiro_for_photo" class="checkbox">
-                        <label for="agree_neiro_for_photo">использовать нейросети для генерации фото</label>
-                    </div>
-                    <div class="block--flex_row agree">
-                        <input type="checkbox" id="agree_neiro_for_text" class="checkbox">
-                        <label for="agree_neiro_for_text">использовать нейросети для проверки и улучшения текста</label>
-                    </div>
-                    <div class="grid_main_buttons">
-                        <button id="cancel" class="cancel_button border_bottom main_button">отменить</button>
-                        <button id="ok" class="confirm_button border_bottom main_button">принять</button>
-                    </div>
-                </section>
-            </div>
+                    <button class="hyper_text_link__button border_bottom" type="button">+</button>
+                </div>
+                <div class="block--flex_row agree">
+                    {{ form.use_ai_image(class="checkbox") }}
+                    <label for="agree_neiro_for_photo">использовать нейросети для генерации фото</label>
+                </div>
+                <div class="block--flex_row agree">
+                    {{ form.use_ai_text(class="checkbox") }}
+                    <label for="agree_neiro_for_text">использовать нейросети для проверки и улучшения текста</label>
+                </div>
+                <div class="grid_main_buttons">
+                    {{ form.cancel(class="cancel_button border_bottom main_button") }}
+                    {{ form.submit(class="confirm_button border_bottom main_button") }}
+                </div>
+            </form>
         </div>
-    {% endblock main_content %}
-    {% block scripts %}
-        <script type="module">
-            import { DecorativeWaveElement } from '/static/js/decor_create_recipe_page.js';
+    </div>
+{% endblock main_content %}
+{% block scripts %}
+    <script type="module">
+        import {DecorativeWaveElement} from '/static/js/decor_create_recipe_page.js';
+        import {AddInForm} from '/static/js/add_in_form.js';
 
-            let where = document.getElementById('back_plus_waves');
-            let decor_wave_1 = new DecorativeWaveElement(
-                165, 970, 0, 2, where
-            );
-            let decor_wave_2 = new DecorativeWaveElement(
-                165, 970, 0, 1, where
-            );
+        let where = document.getElementById('back_plus_waves');
+        let decor_wave_1 = new DecorativeWaveElement(
+            165, 970, 0, 2, where
+        );
+        let decor_wave_2 = new DecorativeWaveElement(
+            165, 970, 0, 1, where
+        );
 
-            decor_wave_1.show(1, 1, 1);
-            decor_wave_2.show(1, 3, 0);
+        decor_wave_1.show(1, 1, 1);
+        decor_wave_2.show(1, 3, 0);
 
-            const observer = new ResizeObserver((entries) => {
-                for (const entry of entries) {
-                    const {width, height} = entry.contentRect
-                    let cont_elem = document.getElementById('back_plus_waves');
-                    cont_elem.removeChild(cont_elem.firstChild);
-                    cont_elem.removeChild(cont_elem.lastChild);
-                    const size_elem = document.getElementById('back').getBoundingClientRect()
-                    decor_wave_1.show((Math.round(size_elem.height / decor_wave_1.height)), 1, 1);
-                    decor_wave_2.show((Math.round(size_elem.height / decor_wave_2.height)), 3, 0);
-                    console.log(`width: ${width} height: ${height}`)
-                }
+        const observer = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                const {width, height} = entry.contentRect
+                let cont_elem = document.getElementById('back_plus_waves');
+                cont_elem.removeChild(cont_elem.firstChild);
+                cont_elem.removeChild(cont_elem.lastChild);
+                const size_elem = document.getElementById('back').getBoundingClientRect()
+                decor_wave_1.show((Math.round(size_elem.height / decor_wave_1.height)), 1, 1);
+                decor_wave_2.show((Math.round(size_elem.height / decor_wave_2.height)), 3, 0);
+                console.log(`width: ${width} height: ${height}`)
+            }
+        });
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelectorAll('.button--scroll-up').forEach(button => {
+                button.addEventListener('click', () => {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'  // Добавляем плавную прокрутку
+                    });
+                });
             });
-            document.querySelector('footer').addEventListener('click', (event) => {
-                document.getElementById('back').style.height = '10000px'
-            })
-            document.addEventListener('DOMContentLoaded', (event) => {
-                observer.observe(document.getElementById('back'));
-            });
-        </script>
-    {% endblock scripts %}
+            observer.observe(document.getElementById('back'));
+        });
+    </script>
+{% endblock scripts %}
 </body>
 </html>

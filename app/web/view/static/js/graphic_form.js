@@ -3,6 +3,7 @@ class RecipeForm {
         this.currentStep = 1;
         this.totalSteps = 6;
         this.zoomLevel = 1;
+        this.baseFontSize = 16ё;
         this.recipeData = null;
         this.selectedBlock = null;
         this.blocks = [];
@@ -26,15 +27,15 @@ class RecipeForm {
             hashtags: ["food", "recipe", "delicious"],
             categories: "Main Dish, Dinner",
             ingredients: [
-                { name: "Flour", quantity: "2 cups" },
-                { name: "Sugar", quantity: "1 cup" },
-                { name: "Eggs", quantity: "3" },
-                { name: "Milk", quantity: "1 cup" }
+                {name: "Flour", quantity: "2 cups"},
+                {name: "Sugar", quantity: "1 cup"},
+                {name: "Eggs", quantity: "3"},
+                {name: "Milk", quantity: "1 cup"}
             ],
             steps: [
-                { number: 1, name: "Mix dry ingredients" },
-                { number: 2, name: "Add wet ingredients" },
-                { number: 3, name: "Bake at 350°F for 30 minutes" }
+                {number: 1, name: "Mix dry ingredients"},
+                {number: 2, name: "Add wet ingredients"},
+                {number: 3, name: "Bake at 350°F for 30 minutes"}
             ],
             result: "A delicious cake that everyone will love!",
             result_link: "#",
@@ -43,42 +44,30 @@ class RecipeForm {
     }
 
     initEventListeners() {
-        // Navigation
+        document.getElementById('savePngBtn').addEventListener('click', () => this.saveAsPng());
         document.getElementById('prevStepBtn').addEventListener('click', () => this.prevStep());
         document.getElementById('nextStepBtn').addEventListener('click', () => this.nextStep());
-
-        // Steps
         document.querySelectorAll('.step-dot').forEach(dot => {
             dot.addEventListener('click', () => {
                 const step = parseInt(dot.dataset.step);
                 this.showStep(step);
             });
         });
-
-        // Zoom
         document.getElementById('zoomInBtn').addEventListener('click', () => this.zoomIn());
         document.getElementById('zoomOutBtn').addEventListener('click', () => this.zoomOut());
-
-        // Clear
         document.getElementById('clearBtn').addEventListener('click', () => this.clearAll());
-
-        // Blocks
         document.querySelectorAll('.block-type').forEach(block => {
             block.addEventListener('click', () => {
                 const type = block.dataset.type;
                 this.addBlock(type);
             });
         });
-
-        // Layouts
         document.querySelectorAll('.layout-option').forEach(option => {
             option.addEventListener('click', () => {
                 const layout = option.dataset.layout;
                 this.applyLayout(layout);
             });
         });
-
-        // Text settings
         document.getElementById('fontFamily').addEventListener('change', () => this.updateTextSettings());
         document.getElementById('fontSize').addEventListener('input', (e) => {
             document.getElementById('fontSizeValue').textContent = e.target.value + 'px';
@@ -87,8 +76,6 @@ class RecipeForm {
         document.getElementById('fontWeight').addEventListener('change', () => this.updateTextSettings());
         document.getElementById('italicCheckbox').addEventListener('change', () => this.updateTextSettings());
         document.getElementById('underlineCheckbox').addEventListener('change', () => this.updateTextSettings());
-
-        // Resolution
         document.querySelectorAll('.resolution-option').forEach(option => {
             option.addEventListener('click', () => {
                 const resolution = option.dataset.resolution;
@@ -96,19 +83,14 @@ class RecipeForm {
             });
         });
 
-        // Background
         document.querySelectorAll('.background-option').forEach(option => {
             option.addEventListener('click', () => {
                 const bg = option.dataset.bg;
                 this.setBackground(bg);
             });
         });
-
-        // Save
         document.getElementById('saveHtmlBtn').addEventListener('click', () => this.saveAsHtml());
         document.getElementById('savePngBtn').addEventListener('click', () => this.saveAsPng());
-
-        // Context menu
         document.addEventListener('contextmenu', (e) => {
             if (e.target.closest('.block')) {
                 e.preventDefault();
@@ -117,13 +99,9 @@ class RecipeForm {
         });
 
         document.addEventListener('click', () => this.hideContextMenu());
-
-        // Добавляем обработчик для изменения цвета шрифта
         document.getElementById('fontColor').addEventListener('input', (e) => {
             this.updateTextSettings();
         });
-
-        // Добавляем обработчики для редактирования палитры
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('palette-color')) {
                 this.editPaletteColor(e.target);
@@ -137,23 +115,23 @@ class RecipeForm {
 
         // Purple palettes
         const purplePalettes = [
-            { name: "Classic Purple", colors: ["#2D3250", "#3D4468", "#545B81", "#686F95", "#8F94B4"] },
-            { name: "Deep Purple", colors: ["#1A1C2E", "#2D3250", "#4A4F7A", "#686F95", "#A0A5C8"] },
-            { name: "Pastel Purple", colors: ["#D1D4E4", "#B8BCE0", "#9FA5DB", "#868ED6", "#6D77D1"] }
+            {name: "Classic Purple", colors: ["#2D3250", "#3D4468", "#545B81", "#686F95", "#8F94B4"]},
+            {name: "Deep Purple", colors: ["#1A1C2E", "#2D3250", "#4A4F7A", "#686F95", "#A0A5C8"]},
+            {name: "Pastel Purple", colors: ["#D1D4E4", "#B8BCE0", "#9FA5DB", "#868ED6", "#6D77D1"]}
         ];
 
         // Additional palettes
         const additionalPalettes = [
-            { name: "Autumn", colors: ["#4A2511", "#8D3B1B", "#C45D2B", "#E88B4F", "#F2B279"] },
-            { name: "Ocean", colors: ["#0A2463", "#3E5C76", "#7EA8BE", "#BFD7EA", "#F2F2F2"] },
-            { name: "Forest", colors: ["#283618", "#4A5D23", "#606C38", "#A5AE8F", "#D4D8C9"] },
-            { name: "Sunset", colors: ["#370617", "#6A040F", "#9D0208", "#D00000", "#DC2F02"] },
-            { name: "Mint", colors: ["#0B3C49", "#16697A", "#379683", "#57C4B0", "#87E0D1"] },
-            { name: "Berry", colors: ["#3A0CA3", "#480CA8", "#560BAD", "#7209B7", "#B5179E"] },
-            { name: "Earth", colors: ["#3A3335", "#5C4742", "#7D5E5A", "#9D7879", "#C69F9F"] },
-            { name: "Sky", colors: ["#012A4A", "#013A63", "#01497C", "#014F86", "#2A6F97"] },
-            { name: "Warm", colors: ["#582F0E", "#7F4F24", "#936639", "#A68A64", "#B6AD90"] },
-            { name: "Cool", colors: ["#0D1B2A", "#1B263B", "#415A77", "#778DA9", "#E0E1DD"] }
+            {name: "Autumn", colors: ["#4A2511", "#8D3B1B", "#C45D2B", "#E88B4F", "#F2B279"]},
+            {name: "Ocean", colors: ["#0A2463", "#3E5C76", "#7EA8BE", "#BFD7EA", "#F2F2F2"]},
+            {name: "Forest", colors: ["#283618", "#4A5D23", "#606C38", "#A5AE8F", "#D4D8C9"]},
+            {name: "Sunset", colors: ["#370617", "#6A040F", "#9D0208", "#D00000", "#DC2F02"]},
+            {name: "Mint", colors: ["#0B3C49", "#16697A", "#379683", "#57C4B0", "#87E0D1"]},
+            {name: "Berry", colors: ["#3A0CA3", "#480CA8", "#560BAD", "#7209B7", "#B5179E"]},
+            {name: "Earth", colors: ["#3A3335", "#5C4742", "#7D5E5A", "#9D7879", "#C69F9F"]},
+            {name: "Sky", colors: ["#012A4A", "#013A63", "#01497C", "#014F86", "#2A6F97"]},
+            {name: "Warm", colors: ["#582F0E", "#7F4F24", "#936639", "#A68A64", "#B6AD90"]},
+            {name: "Cool", colors: ["#0D1B2A", "#1B263B", "#415A77", "#778DA9", "#E0E1DD"]}
         ];
 
         // Create palette elements
@@ -291,12 +269,33 @@ class RecipeForm {
 
         // Standard blocks
         const blocks = [
-            { type: 'description', title: 'Description', content: this.recipeData.description, x: 50, y: 50, rotation: -5 },
-            { type: 'hashtags', title: 'Hashtags', content: this.recipeData.hashtags.join(' '), x: 360, y: 30, rotation: -2 },
-            { type: 'categories', title: 'Categories', content: this.recipeData.categories, x: 670, y: 50, rotation: 5 },
-            { type: 'ingredients', title: 'Ingredients', content: this.createIngredientsContent(), x: 50, y: 570, rotation: 5 },
-            { type: 'steps', title: 'Steps', content: this.createStepsContent(), x: 360, y: 590, rotation: 2 },
-            { type: 'result', title: 'Result', content: this.recipeData.result, x: 670, y: 570, rotation: -5 }
+            {
+                type: 'description',
+                title: 'Description',
+                content: this.recipeData.description,
+                x: 50,
+                y: 50,
+                rotation: -5
+            },
+            {
+                type: 'hashtags',
+                title: 'Hashtags',
+                content: this.recipeData.hashtags.join(' '),
+                x: 360,
+                y: 30,
+                rotation: -2
+            },
+            {type: 'categories', title: 'Categories', content: this.recipeData.categories, x: 670, y: 50, rotation: 5},
+            {
+                type: 'ingredients',
+                title: 'Ingredients',
+                content: this.createIngredientsContent(),
+                x: 50,
+                y: 570,
+                rotation: 5
+            },
+            {type: 'steps', title: 'Steps', content: this.createStepsContent(), x: 360, y: 590, rotation: 2},
+            {type: 'result', title: 'Result', content: this.recipeData.result, x: 670, y: 570, rotation: -5}
         ];
 
         blocks.forEach(blockData => {
@@ -876,11 +875,14 @@ class RecipeForm {
 
     updateTextSettings() {
         const fontFamily = document.getElementById('fontFamily').value;
-        const fontSize = document.getElementById('fontSize').value + 'px';
+        const fontSizePercent = document.getElementById('fontSize').value;
+        const fontSize = (this.baseFontSize * fontSizePercent / 100) + 'px';
         const fontWeight = document.getElementById('fontWeight').value;
         const fontStyle = document.getElementById('italicCheckbox').checked ? 'italic' : 'normal';
         const textDecoration = document.getElementById('underlineCheckbox').checked ? 'underline' : 'none';
         const fontColor = document.getElementById('fontColor').value;
+
+        document.getElementById('fontSizeValue').textContent = fontSizePercent + '%';
 
         this.previewWrapper.querySelectorAll('h1, h2, h3, p, li, div').forEach(text => {
             text.style.fontFamily = fontFamily;
@@ -1008,7 +1010,7 @@ class RecipeForm {
             this.previewWrapper.querySelectorAll('.block').forEach(block => {
                 if (block.classList.contains('main-card') ||
                     ['description', 'hashtags', 'categories', 'ingredients', 'steps', 'result']
-                    .some(id => block.dataset.id === id)) return;
+                        .some(id => block.dataset.id === id)) return;
 
                 block.remove();
             });
@@ -1135,7 +1137,7 @@ class RecipeForm {
             if (!editor.contains(e.target)) {
                 editor.remove();
             }
-        }, { once: true });
+        }, {once: true});
     }
 
     getRotationAngle(element) {
@@ -1172,20 +1174,164 @@ class RecipeForm {
     }
 
     saveAsHtml() {
-        const html = this.previewWrapper.innerHTML;
-        const blob = new Blob([html], { type: 'text/html' });
+        // Создаем копию wrapper для сохранения
+        const wrapperClone = this.previewWrapper.cloneNode(true);
+        const bgColor = this.previewWrapper.style.backgroundColor || 'white';
+        const bgImage = this.previewWrapper.style.backgroundImage || 'none';
+
+        // Фиксируем все блоки
+        wrapperClone.querySelectorAll('.block').forEach(block => {
+            // Удаляем все интерактивные элементы
+            const colorPickers = block.querySelectorAll('.color-picker');
+            colorPickers.forEach(picker => picker.remove());
+
+            // Удаляем contenteditable
+            const editableElements = block.querySelectorAll('[contenteditable="true"]');
+            editableElements.forEach(el => el.removeAttribute('contenteditable'));
+
+            // Фиксируем позицию и размеры
+            const rect = block.getBoundingClientRect();
+            const parentWidth = this.previewWrapper.offsetWidth;
+            const parentHeight = this.previewWrapper.offsetHeight;
+
+            block.style.position = 'absolute';
+            block.style.left = `${(rect.left / parentWidth * 100)}%`;
+            block.style.top = `${(rect.top / parentHeight * 100)}%`;
+            block.style.width = `${(block.offsetWidth / parentWidth * 100)}%`;
+            block.style.height = 'auto';
+        });
+
+        // Создаем полный HTML-документ
+        const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>${this.recipeData.name}</title>
+        <style>
+            body { margin: 0; padding: 0; }
+            .preview-wrapper {
+                position: relative;
+                width: 100%;
+                height: 0;
+                padding-bottom: 100%;
+                margin: 0 auto;
+                background: ${bgColor};
+                background-image: ${bgImage};
+                background-size: cover;
+                overflow: hidden;
+            }
+            .block {
+                position: absolute;
+                box-sizing: border-box;
+                padding: 15px;
+                background: white;
+                border: 2px solid #686F95;
+                border-radius: 10px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            }
+            .block h1, .block h2, .block h3, .block p {
+                margin: 0 0 10px 0;
+                color: #374967;
+            }
+            .block img {
+                max-width: 100%;
+                height: auto;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="preview-wrapper">
+            ${wrapperClone.innerHTML}
+        </div>
+    </body>
+    </html>
+    `;
+
+        const blob = new Blob([html], {type: 'text/html'});
         const url = URL.createObjectURL(blob);
 
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'recipe.html';
+        a.download = `${this.recipeData.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_recipe.html`;
         a.click();
 
         URL.revokeObjectURL(url);
     }
 
-    saveAsPng() {
-        alert('PNG export would be implemented here using a library like html2canvas');
+// Обновите функцию saveAsPng:
+    async saveAsPng() {
+        try {
+            // Показываем сообщение о начале процесса
+            const loadingMsg = document.createElement('div');
+            loadingMsg.style.position = 'fixed';
+            loadingMsg.style.top = '20px';
+            loadingMsg.style.left = '50%';
+            loadingMsg.style.transform = 'translateX(-50%)';
+            loadingMsg.style.backgroundColor = '#545B81';
+            loadingMsg.style.color = 'white';
+            loadingMsg.style.padding = '10px 20px';
+            loadingMsg.style.borderRadius = '5px';
+            loadingMsg.style.zIndex = '10000';
+            loadingMsg.textContent = 'Создание PNG...';
+            document.body.appendChild(loadingMsg);
+
+            // Используем html2canvas для создания PNG
+            const html2canvas = await import('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+
+            // Создаем копию wrapper для рендеринга
+            const wrapperClone = this.previewWrapper.cloneNode(true);
+            wrapperClone.style.transform = 'none';
+            wrapperClone.style.width = '1000px';
+            wrapperClone.style.height = '800px';
+            wrapperClone.style.background = this.previewWrapper.style.background;
+            wrapperClone.style.backgroundColor = this.previewWrapper.style.backgroundColor;
+            wrapperClone.style.backgroundImage = this.previewWrapper.style.backgroundImage;
+
+            // Фиксируем все блоки
+            wrapperClone.querySelectorAll('.block').forEach(block => {
+                block.style.position = 'absolute';
+                const rect = block.getBoundingClientRect();
+                const parentWidth = this.previewWrapper.offsetWidth;
+                const parentHeight = this.previewWrapper.offsetHeight;
+
+                block.style.left = `${(rect.left / parentWidth * 1000)}px`;
+                block.style.top = `${(rect.top / parentHeight * 800)}px`;
+                block.style.width = `${(block.offsetWidth / parentWidth * 1000)}px`;
+            });
+
+            // Временно добавляем клон в DOM
+            wrapperClone.style.visibility = 'hidden';
+            wrapperClone.style.position = 'absolute';
+            wrapperClone.style.top = '0';
+            wrapperClone.style.left = '0';
+            document.body.appendChild(wrapperClone);
+
+            // Конвертируем в canvas
+            const canvas = await html2canvas.default(wrapperClone, {
+                scale: 2,
+                logging: false,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: null
+            });
+
+            // Удаляем клон
+            document.body.removeChild(wrapperClone);
+
+            // Создаем ссылку для скачивания
+            const link = document.createElement('a');
+            link.download = `${this.recipeData.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_recipe.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+
+            // Удаляем сообщение о загрузке
+            loadingMsg.remove();
+
+        } catch (error) {
+            console.error('Error generating PNG:', error);
+            alert('Произошла ошибка при создании PNG. Пожалуйста, попробуйте снова.');
+        }
     }
 }
 

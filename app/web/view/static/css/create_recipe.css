@@ -185,12 +185,40 @@ button {
      padding-top: 10px;
      text-align: center;
      font-weight: 700;
-     height: 65px;
+     height: max-content;
+     display: flex;
+     justify-content: center;
+     align-items: center;
      width: 1040px;
      color: white;
      font-size: 20px;
      background-color: #686F95;
      padding-bottom: 10px;
+ }
+ .select_category[type^='header'] {
+     height: 65px;
+ }
+
+ .select_category_option {
+     height: 200px;
+     overflow: hidden;
+ }
+
+ .select_category_option option {
+     font-family: inherit;
+     font-size: 20px;
+     font-weight: 700;
+     text-transform: lowercase;
+ }
+
+ .select_category_option option:hover {
+     background-color: #8F94B4;
+     transform: scaleY(1.12);
+ }
+
+ .select_category_option option:checked {
+     background-color: #545B81!important;
+     color: white;
  }
 /* form block 1 end*/
 /* form block 2 start*/
@@ -251,6 +279,23 @@ button {
 }
 
 .label__button--delete_ing {
+    cursor: pointer;
+}
+
+.label__button--delete_link {
+    min-width: 40px;
+    max-width: 50px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    font-size: 20px;
+    color: #686F95;
+    font-family: inherit;
+    font-weight: inherit;
+    font-style: inherit;
     cursor: pointer;
 }
 
@@ -452,8 +497,15 @@ button {
     padding: 10px 20px;
     background-color: #545B81;
     display: grid;
-    grid-template-columns: 1fr 3fr;
-    column-gap: 10px;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    gap: 10px;
+}
+
+.links--add .link {
+    display: grid;
+    grid-template-columns: 1fr 3fr 0.2fr;
+    column-gap: 15px;
 }
 
 .links--add .container input {
@@ -659,9 +711,114 @@ button {
 .agree .checkbox:active {
   transform: scale(0.95);
 }
-footer {
-    transform: translateY(-700px);
+/*footer {*/
+/*    transform: translateY(-700px);*/
+/*}*/
+
+#container_graph {
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr;
+    gap: 10px 10px;
 }
 /* form block 3 end */
+/* button condition */
 
+/* Общие стили для всех кнопок */
+button,
+.button--add_images,
+.add-button,
+.main_button,
+.step__elem--del,
+.label__button--delete_ing,
+.label__button--delete_link,
+.confirm_button,
+.cancel_button {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+/* Состояние при наведении */
+button:hover,
+.button--add_images:hover,
+.add-button:hover,
+.main_button:hover,
+.step__elem--del:hover,
+.label__button--delete_ing:hover,
+.label__button--delete_link:hover,
+.confirm_button:hover,
+.cancel_button:hover {
+    background-color: #8F94B4 !important;
+    color: #FFFFFF;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Активное состояние (при нажатии) */
+button:active,
+.button--add_images:active,
+.add-button:active,
+.main_button:active,
+.step__elem--del:active,
+.label__button--delete_ing:active,
+.label__button--delete_link:active,
+.confirm_button:active,
+.cancel_button:active {
+    background-color: #4A5068 !important;
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Фокус состояние */
+button:focus,
+.button--add_images:focus,
+.add-button:focus,
+.main_button:focus,
+.step__elem--del:focus,
+.label__button--delete_ing:focus,
+.label__button--delete_link:focus,
+.confirm_button:focus,
+.cancel_button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(104, 111, 149, 0.5);
+}
+
+/* Специфичные стили для кнопки удаления */
+.label__button--delete_ing:hover,
+.label__button--delete_link:hover {
+    background-color: #D35D6E !important;
+}
+
+.label__button--delete_ing:active,
+.label__button--delete_link:active {
+    background-color: #B74758 !important;
+}
+
+/* Специфичные стили для confirm кнопки */
+.confirm_button:hover {
+    background-color: #4A5F8F !important;
+}
+
+.confirm_button:active {
+    background-color: #3A4F7F !important;
+}
+
+/* Специфичные стили для cancel кнопки */
+.cancel_button:hover {
+    background-color: #9FA6D1 !important;
+}
+
+.cancel_button:active {
+    background-color: #8F96C1 !important;
+}
+
+/* Специфичные стили для кнопки добавления изображений */
+.button--add_images:hover {
+    background-color: #6A72A0 !important;
+}
+
+.button--add_images:active {
+    background-color: #4A5068 !important;
+}
 

@@ -1,8 +1,13 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, FieldList, FormField,\
+from wtforms import StringField, TextAreaField, FieldList, FormField, \
     FileField, SubmitField, BooleanField, SelectMultipleField, IntegerField
 from wtforms.validators import DataRequired, Length, NumberRange
 from wtforms.widgets import TextArea
+
+
+class LinkForm(FlaskForm):
+    link_description = StringField('Куда ведет', validators=[DataRequired()])
+    link = StringField('Ссылка', validators=[DataRequired()])
 
 
 # Вложенная форма для ингредиентов
@@ -10,7 +15,7 @@ class IngredientForm(FlaskForm):
     number = IntegerField('Номер', validators=[DataRequired(), NumberRange(min=1)])
     name = StringField('Название', validators=[DataRequired()])
     for_what = StringField('Для чего', validators=[Length(max=255)])
-    quantity = IntegerField('Количество', validators=[DataRequired()])
+    quantity = IntegerField('Количество', validators=[DataRequired(), NumberRange(min=1)])
 
 
 # Вложенная форма для этапа
@@ -19,9 +24,9 @@ class StepForm(FlaskForm):
     name = StringField('Название этапа', validators=[DataRequired(), Length(max=255)])
     description = TextAreaField('Описание этапа', validators=[DataRequired()])
     explanations = TextAreaField('Пояснения', validators=[DataRequired()])
-    images = FileField('Картинки', render_kw={"multiple": True})  # для загрузки нескольких картинок
-    link = StringField('Ссылка', validators=[DataRequired()])
-    link_description = StringField('Описание ссылки', validators=[DataRequired()])
+    images = FileField('Картинки', render_kw={"multiple": True})
+    # Удалить link и link_description из StepForm, так как они теперь в LinkForm
+    links = FieldList(FormField(LinkForm), min_entries=1)  # Добавить FieldList для ссылок
 
 
 # Форма рецепта

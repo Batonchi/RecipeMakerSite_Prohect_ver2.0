@@ -1,0 +1,18 @@
+<div class="ingredient block--flex_row">
+    <label class="id_ing">{{ index }}</label>
+    <input type="text"
+           name="ingredients-{{ index }}-name"
+           class="style_font"
+           placeholder="наименование"
+           required>
+    <input type="text"
+           name="ingredients-{{ index }}-for_what"
+           class="style_font"
+           placeholder="для чего">
+    <input type="number"
+           name="ingredients-{{ index }}-quantity"
+           class="style_font"
+           placeholder="кол-во"
+           required>
+    <label class="label__button--delete_ing">x</label>
+</div>

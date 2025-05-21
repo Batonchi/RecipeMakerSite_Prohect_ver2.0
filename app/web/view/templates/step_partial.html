@@ -1,0 +1,57 @@
+<div class="steps__elem">
+    <div class="block--flex_row">
+        <div class="block--flex_column">
+            <div class="grid_input_custom_label var_grid_1">
+                <div class="label_back border_bottom_right_top_left">имя</div>
+                <input type="text"
+                       name="steps-{{ index }}-name"
+                       class="border_bottom style_font limit_width_input"
+                       required>
+                <div class="border_bottom label_back">номер</div>
+                <input type="text"
+                       name="steps-{{ index }}-number"
+                       class="style_font border_top_right_bottom_left limit_width_input"
+                       required>
+            </div>
+            <div class="grid_input_custom_label var_grid_2">
+                <div class="label_back border_right">описание</div>
+                <textarea name="steps-{{ index }}-description"
+                          class="style_font border_left"
+                          required
+                          style="resize: none; border: none"></textarea>
+                <div class="label_back border_top_right_bottom_left">пояснение</div>
+                <textarea name="steps-{{ index }}-explanations"
+                          class="style_font border_bottom_right_top_left"
+                          required
+                          style="resize: none; border: none"></textarea>
+            </div>
+            <div class="step--add_graphic border_top border_bottom">
+                <div class="border_bottom border_top container">
+                    выберите графическую составляющую этапа
+                    <div id="container_graph"></div>
+                </div>
+                <button class="border_bottom button--add_images" type="button">+</button>
+            </div>
+            <div class="step--add_links links--add border_bottom border_top">
+                <div class="container border_bottom border_top" id="step_links">
+                    <div class="link">
+                        <input type="text"
+                               name="steps-{{ index }}-links-0-link_description"
+                               placeholder="куда ведет"
+                               class="where border_bottom border_top"
+                               required>
+                        <input type="text"
+                               name="steps-{{ index }}-links-0-link"
+                               placeholder="ссылка"
+                               class="link_str border_bottom border_top"
+                               required>
+                        <label class="label__button--delete_link">x</label>
+                    </div>
+                </div>
+                <div class="between_link_and_add border_bottom border_top">нажмите +, чтобы добавить ссылку</div>
+                <button class="add-button border_bottom" type="button">+</button>
+            </div>
+        </div>
+        <button class="step__elem--del" type="button">x</button>
+    </div>
+</div>

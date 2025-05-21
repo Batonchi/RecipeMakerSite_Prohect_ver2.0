@@ -1,10 +1,80 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Регистрация</title>
+    <link href="/static/css/registration.css" rel="stylesheet">
 </head>
 <body>
+<div class="block--background">
+    <div class="header">
+        <div class="header__back--custom"></div>
+        <div class="header__text block--flex_column">
+            <h1>PRETTY RECIPEMAKER</h1>
+            <h2>Регистрация</h2>
+        </div>
+    </div>
+    <form method="post" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
 
+        <label class="form__label" for="name">{{ form.name.label }}</label>
+        {{ form.name(class="form-control", id="name") }}
+        {% for error in form.name.errors %}
+            <p class="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+        {% endfor %}
+
+        <label class="form__label" for="surname">{{ form.surname.label }}</label>
+        {{ form.surname(class="form-control", id="surname") }}
+        {% for error in form.surname.errors %}
+            <p class="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+        {% endfor %}
+
+        <label class="form__label" for="birth_date">{{ form.date_of_birth.label }}</label>
+        {{ form.date_of_birth(class="form-control", id="birth_date") }}
+        {% for error in form.date_of_birth.errors %}
+            <p class="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+        {% endfor %}
+
+        <label class="form__label" for="email">{{ form.email.label }}</label>
+        {{ form.email(class="form-control", type="email", id="email") }}
+        {% for error in form.email.errors %}
+            <p class="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+        {% endfor %}
+
+        <label class="form__label" for="password">{{ form.password.label }}</label>
+        {{ form.password(class="form-control", type="password", id="password") }}
+        {% for error in form.password.errors %}
+            <p class="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+        {% endfor %}
+
+        <label class="form__label" for="repeat_password">{{ form.password_again.label }}</label>
+        {{ form.password_again(class="form-control", type="password", id="repeat_password") }}
+        {% for error in form.password_again.errors %}
+            <p class="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+        {% endfor %}
+
+        <p class="agreement">нажимая кнопку зарегистрироватся, я принимаю соглашение о получение информации, оповещений из сервиса через
+            стороние службы связи</p>
+    </form>
+    <div class="button--reg">
+        {{ form.submit(type="submit", class="btn btn-primary button") }}
+    </div>
+    {{message}}
+</div>
 </body>
 </html>
