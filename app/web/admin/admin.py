@@ -14,6 +14,7 @@ from app.support.model import Complaint
 from base.database import async_session_maker, engine
 from app.support.service import BankComplaintService
 
+
 app = FastAPI()
 app.mount('/static', StaticFiles(directory='app/view/static'))
 admin = Admin(app, engine, base_url="/admin",
@@ -23,14 +24,23 @@ admin.templates.env.globals["admin_extra_css"] = [
 ]
 
 
+# В admin.py добавляем новый класс для админки жалоб
 class ComplaintAdmin(ModelView, model=Complaint):
     name = "Жалоба"
     name_plural = "Жалобы"
-    icon = "fa-solid fa-bolt"
+    icon = "fa-solid fa-triangle-exclamation"
 
-    column_list = [Complaint.id, Complaint.user_id, Complaint.text]
+    column_list = [Complaint.id, Complaint.user_id, Complaint.text,
+                   Complaint.date_pushed, Complaint.is_solved]
     column_searchable_list = [Complaint.user_id]
-    form_columns = [Complaint.user_id, Complaint.text]
+    column_filters = [Complaint.is_solved]
+    column_default_sort = [(Complaint.date_pushed, True)]
+    form_columns = [Complaint.user_id, Complaint.text, Complaint.is_solved]
+
+    async def on_model_change(self, data, model, is_created):
+        if not is_created and data.get('is_solved'):
+            pass
+        await super().on_model_change(data, model, is_created)
 
 
 class BankClientAdmin(ModelView, model=BankClient):

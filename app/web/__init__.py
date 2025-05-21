@@ -1,23 +1,30 @@
-from flask import Flask
-from flask_executor import Executor
+from flask import Flask, render_template
 from app.base.constant import SECRET_KEY
+import os
 
 
 def create_app():
     app = Flask(__name__,
-                static_url_path='/web_app_init/view/static',
-                template_folder='view')
-    app.secret_key = SECRET_KEY
+                static_url_path='/static',
+                static_folder=os.path.abspath('app/web/view/static'),
+                template_folder=os.path.abspath('app/web/view/templates'))
 
-    # Инициализируем эту хрень для асинхронных задач
-    executor = Executor(app)
-    app.executor = executor
+    app.secret_key = SECRET_KEY
 
     # Импорт и регистрация blueprint'ов
     from app.web.auth.router import router as auth_router
-    from app.web.recipes.router import router as recipe_router
+    from app.web.recipes.router import router as recipes_router
+    from app.web.support.router import router as support_router
+    from app.web.admin.router import router as admin_router
 
+
+    app.register_blueprint(admin_router)
     app.register_blueprint(auth_router)
-    app.register_blueprint(recipe_router)
+    app.register_blueprint(recipes_router)
+    app.register_blueprint(support_router)
+
+    @app.route('/', methods=['GET', 'POST'])
+    def index():
+        return render_template('create_recipe_form.html', title='Создание Рецепта')
 
     return app

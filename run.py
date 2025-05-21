@@ -3,7 +3,7 @@ from flask import redirect, Flask
 from app.web import create_app
 from app.web.support.support_mail import mail_app
 from app.web.notification.notification_mail import notification_mail_app
-from app.web.main import app as web_app_init
+# from app.web.main import app as web_app_init
 # from app.bots.main import app as bot_app
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 import asyncio

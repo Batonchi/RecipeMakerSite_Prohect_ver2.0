@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mt-4">Управление жалобами</h1>
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-table mr-1"></i>
+            Список жалоб
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Пользователь</th>
+                            <th>Текст</th>
+                            <th>Дата</th>
+                            <th>Статус</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for complaint in complaints %}
+                        <tr>
+                            <td>{{ complaint.id }}</td>
+                            <td>{{ complaint.user_id }}</td>
+                            <td>{{ complaint.text }}</td>
+                            <td>{{ complaint.date_pushed.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>
+                                {% if complaint.is_solved %}
+                                <span class="badge bg-success">Решено</span>
+                                {% else %}
+                                <span class="badge bg-warning">В обработке</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-primary btn-sm" 
+                                        onclick="updateStatus({{ complaint.id }}, true)">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-warning btn-sm" 
+                                        onclick="updateStatus({{ complaint.id }}, false)">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-info btn-sm" 
+                                        onclick="sendResponse({{ complaint.id }})">
+                                        <i class="fas fa-reply"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm" 
+                                        onclick="deleteComplaint({{ complaint.id }})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-envelope mr-1"></i>
+                    Массовая рассылка
+                </div>
+                <div class="card-body">
+                    <form id="massMailForm">
+                        <div class="mb-3">
+                            <label for="mailSubject" class="form-label">Тема письма</label>
+                            <input type="text" class="form-control" id="mailSubject" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="mailContent" class="form-label">Содержание</label>
+                            <textarea class="form-control" id="mailContent" rows="5" required></textarea>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="includeSolved">
+                            <label class="form-check-label" for="includeSolved">Включить решенные жалобы</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Отправить всем</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-pie mr-1"></i>
+                    Статистика
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card text-white bg-primary mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">Всего жалоб</h5>
+                                    <p class="card-text display-4">{{ complaints|length }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card text-white bg-success mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">Решено</h5>
+                                    <p class="card-text display-4">{{ complaints|selectattr('is_solved')|list|length }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <canvas id="complaintsChart" width="100%" height="50"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function updateStatus(id, status) {
+    fetch(`/admin/complaints/${id}/status`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({status: status})
+    }).then(response => {
+        if(response.ok) {
+            location.reload();
+        }
+    });
+}
+
+function sendResponse(id) {
+    // Реализация отправки ответа
+    alert(`Ответ на жалобу #${id} будет отправлен`);
+}
+
+function deleteComplaint(id) {
+    if(confirm('Вы уверены, что хотите удалить эту жалобу?')) {
+        fetch(`/admin/complaints/${id}`, {
+            method: 'DELETE'
+        }).then(response => {
+            if(response.ok) {
+                location.reload();
+            }
+        });
+    }
+}
+
+// Инициализация графика
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('complaintsChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Последние 7 дней'],
+            datasets: [{
+                label: 'Жалобы',
+                data: [{{ complaints|length }}],
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
