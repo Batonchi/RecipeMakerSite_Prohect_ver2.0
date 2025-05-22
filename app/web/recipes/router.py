@@ -53,6 +53,14 @@ def get_link_form():
                            link_index=link_index)
 
 
+@router.route('/get-recipe-link-form')
+def get_recipe_link_form():
+    link_index = request.args.get('link_index', 0)
+    form = RecipeForm()
+    link = form.links.append_entry()  # Добавляем новую запись в FieldList
+    return render_template('recipe_link_partial.html', link_index=link_index)
+
+
 def run_async(coro):  # функция для асинхронного запуска корутины.
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
@@ -101,8 +109,12 @@ async def create_recipe():
                                 'name': step.data['name'],
                                 'description': step.data['description'],
                                 'explanations': step.data['explanations'],
-                                'link': step.data['link'],
-                                'link_description': step.data['link_description']
+                                'links': [
+                                    {
+                                        'link_description': link.data['link_description'],
+                                        'link': link.data['link']
+                                    } for link in step.links
+                                ]
                             } for step in form.steps
                         ],
                         'result': form.result.data,

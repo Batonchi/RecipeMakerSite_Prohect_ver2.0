@@ -93,71 +93,72 @@
                     </div>
                     <div class="block--flex_column">
                         {% for step in form.steps %}
-                            <div class="container">
-                                <div class="steps__elem">
-                                    <div class="block--flex_row">
-                                        <div class="block--flex_column">
-                                            <div class="grid_input_custom_label var_grid_1">
-                                                <div class="label_back border_bottom_right_top_left">имя</div>
-                                                <input type="text"
-                                                       name="{{ step.name.name }}"
-                                                       class="border_bottom style_font limit_width_input"
-                                                       required
-                                                       value="{{ step.name.data or '' }}">
-                                                <div class="border_bottom label_back">номер</div>
-                                                <input type="text"
-                                                       name="{{ step.number.name }}"
-                                                       class="style_font border_top_right_bottom_left limit_width_input"
-                                                       required
-                                                       value="{{ step.number.data or '' }}">
-                                            </div>
-                                            <div class="grid_input_custom_label var_grid_2">
-                                                <div class="label_back border_right">описание</div>
-                                                <textarea name="{{ step.description.name }}"
-                                                          class="style_font border_left"
-                                                          required
-                                                          style="resize: none; border: none">{{ step.description.data or '' }}</textarea>
-                                                <div class="label_back border_top_right_bottom_left">пояснение</div>
-                                                <textarea name="{{ step.explanations.name }}"
-                                                          class="style_font border_bottom_right_top_left"
-                                                          required
-                                                          style="resize: none; border: none">{{ step.explanations.data or '' }}</textarea>
-                                            </div>
-                                            <div class="step--add_graphic border_top border_bottom">
-                                                <div class="border_bottom border_top container">
-                                                    выберите графическую составляющую этапа
-                                                    <div id="container_graph"></div>
-                                                </div>
-                                                <button class="border_bottom button--add_images" type="button">+
-                                                </button>
-                                            </div>
-                                            <div class="step--add_links links--add border_bottom border_top">
-                                                <div class="container border_bottom border_top" id="step_links">
-                                                    <div class="link">
-                                                        <input type="text"
-                                                               name="{{ step.link_description.name }}"
-                                                               placeholder="куда ведет"
-                                                               class="where border_bottom border_top"
-                                                               required
-                                                               value="{{ step.link_description.data or '' }}">
-                                                        <input type="text"
-                                                               name="{{ step.link.name }}"
-                                                               placeholder="ссылка"
-                                                               class="link_str border_bottom border_top"
-                                                               required
-                                                               value="{{ step.link.data or '' }}">
-                                                        <label class="label__button--delete_link">x</label>
-                                                    </div>
-                                                </div>
-                                                <div class="between_link_and_add border_bottom border_top">нажмите +,
-                                                    чтобы
-                                                    добавить ссылку
-                                                </div>
-                                                <button class="add--step_link__button border_bottom" type="button">+</button>
-                                            </div>
+                            <div class="steps__elem" data-step-index="0">
+                                <div class="block--flex_row">
+                                    <div class="block--flex_column">
+                                        <div class="grid_input_custom_label var_grid_1">
+                                            <div class="label_back border_bottom_right_top_left">имя</div>
+                                            <input type="text"
+                                                   name="{{ step.name.name }}"
+                                                   class="border_bottom style_font limit_width_input"
+                                                   required
+                                                   value="{{ step.name.data or '' }}">
+                                            <div class="border_bottom label_back">номер</div>
+                                            <input type="text"
+                                                   name="{{ step.number.name }}"
+                                                   class="style_font border_top_right_bottom_left limit_width_input"
+                                                   required
+                                                   value="{{ step.number.data or '' }}">
                                         </div>
-                                        <button class="step__elem--del" type="button">x</button>
+                                        <div class="grid_input_custom_label var_grid_2">
+                                            <div class="label_back border_right">описание</div>
+                                            <textarea name="{{ step.description.name }}"
+                                                      class="style_font border_left"
+                                                      required
+                                                      style="resize: none; border: none">{{ step.description.data or '' }}</textarea>
+                                            <div class="label_back border_top_right_bottom_left">пояснение</div>
+                                            <textarea name="{{ step.explanations.name }}"
+                                                      class="style_font border_bottom_right_top_left"
+                                                      required
+                                                      style="resize: none; border: none">{{ step.explanations.data or '' }}</textarea>
+                                        </div>
+                                        <div class="step--add_graphic border_top border_bottom">
+                                            <div class="border_bottom border_top container">
+                                                выберите графическую составляющую этапа
+                                                <div id="container_graph-{{ loop.index0 }}"
+                                                     class="images-container"></div>
+                                            </div>
+                                            <button class="border_bottom button--add_images" type="button"
+                                                    data-step-index="{{ loop.index0 }}">+
+                                            </button>
+                                        </div>
+                                        <div class="step--add_links links--add border_bottom border_top">
+                                            <div class="container border_bottom border_top" id="step_links">
+                                                <div class="link">
+                                                    <input type="text"
+                                                           name="{{ step.links[0].link_description.name }}"
+                                                           placeholder="куда ведет"
+                                                           class="where border_bottom border_top"
+                                                           required
+                                                           value="{{ step.links[0].link_description.data or '' }}">
+                                                    <input type="text"
+                                                           name="{{ step.links[0].link.name }}"
+                                                           placeholder="ссылка"
+                                                           class="link_str border_bottom border_top"
+                                                           required
+                                                           value="{{ step.links[0].link.data or '' }}">
+                                                    <label class="label__button--delete_link">x</label>
+                                                </div>
+                                            </div>
+                                            <div class="between_link_and_add border_bottom border_top">нажмите +,
+                                                чтобы
+                                                добавить ссылку
+                                            </div>
+                                            <button class="add--step_link__button border_bottom" type="button">+
+                                            </button>
+                                        </div>
                                     </div>
+                                    <button class="step__elem--del" type="button">x</button>
                                 </div>
                             </div>
                         {% endfor %}
@@ -172,12 +173,13 @@
                 </div>
                 <div class="hyper_text links--add border_bottom border_top">
                     <div class="container border_bottom border_top" id="all_links">
-                        <div class="link">
-                            {{ form.result_link_description(placeholder="куда ведет", class="where border_bottom border_top") }}
-                            {{ form.result_link(placeholder="ссылка", class="link_str border_bottom border_top") }}
-                            <label class="label__button--delete_link">x</label>
-                        </div>
-
+                        {% for link in form.links %}
+                            <div class="link">
+                                {{ link.link_description(placeholder="куда ведет", class="where border_bottom border_top") }}
+                                {{ link.link(placeholder="ссылка", class="link_str border_bottom border_top") }}
+                                <label class="label__button--delete_link">x</label>
+                            </div>
+                        {% endfor %}
                     </div>
                     <div class="between_link_and_add border_bottom border_top">
                         нажмите +, чтобы добавить ссылку
@@ -222,16 +224,15 @@
                 let cont_elem = document.getElementById('back_plus_waves');
                 cont_elem.removeChild(cont_elem.firstChild);
                 cont_elem.removeChild(cont_elem.lastChild);
-                const size_elem = document.getElementById('back').getBoundingClientRect()
+                const size_elem = document.getElementById('back').getBoundingClientRect();
                 decor_wave_1.show((Math.round(size_elem.height / decor_wave_1.height)), 1, 1);
                 decor_wave_2.show((Math.round(size_elem.height / decor_wave_2.height)), 3, 0);
-                console.log(`width: ${width} height: ${height}`)
             }
         });
         document.addEventListener('DOMContentLoaded', (event) => {
             document.querySelectorAll('.button--scroll-up').forEach(button => {
                 button.addEventListener('click', () => {
-                    window.scrollTo({
+                    document.getElementById('back').scrollTo({
                         top: 0,
                         behavior: 'smooth'  // Добавляем плавную прокрутку
                     });

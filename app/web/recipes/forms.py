@@ -6,7 +6,7 @@ from wtforms.widgets import TextArea
 
 
 class LinkForm(FlaskForm):
-    link_description = StringField('Куда ведет', validators=[DataRequired()])
+    link_description = StringField('Описание ссылки', validators=[DataRequired()])
     link = StringField('Ссылка', validators=[DataRequired()])
 
 
@@ -40,8 +40,7 @@ class RecipeForm(FlaskForm):
     ingredients = FieldList(FormField(IngredientForm), min_entries=1)
     steps = FieldList(FormField(StepForm), min_entries=1)
     result = TextAreaField('Результат', validators=[DataRequired()], widget=TextArea())
-    result_link = StringField('Ссылка на результат', validators=[DataRequired()])
-    result_link_description = StringField('Описание ссылки на результат', validators=[DataRequired()])
+    links = FieldList(FormField(LinkForm), min_entries=1)
     use_ai_image = BooleanField('Использовать нейросеть для генерации фото', validators=[DataRequired()])
     use_ai_text = BooleanField('Использовать нейросети для проверки и улучшения текста', validators=[DataRequired()])
     cancel = SubmitField('Отменить')
