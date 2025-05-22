@@ -31,3 +31,17 @@ class UserToken(Base):
     user = relationship('User', back_populates='usertokens')
 
 
+class Guest(Base):
+    __tablename__ = 'guests'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    ip_address = Column(String(50), nullable=False)  # IP посетителя
+    visit_count = Column(Integer, default=1)  # Количество визитов
+    first_visit = Column(DateTime, default=datetime.datetime.now)
+    last_visit = Column(DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
+    is_bot = Column(Boolean, default=False)
+    is_new = Column(Boolean, default=True)  # Новый посетитель или возвращающийся
+
+    def __repr__(self):
+        return f"<Guest(id={self.id}, ip={self.ip_address}, first_visit={self.first_visit})>"
+

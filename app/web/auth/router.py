@@ -73,43 +73,42 @@ async def register_page():
     return render_template('new_registration.html', form=RegisterForm())
 
 
-@router.route('/register', methods=['POST'])
+@router.route('/register', methods=['GET', 'POST'])
 async def register_handler():
     form = RegisterForm()
 
-    if not form.validate_on_submit():
-        flash("Пожалуйста, заполните все поля корректно.", 'danger')
-        return render_template('reg.html', form=form)
+    if request.method == 'POST' and form.validate_on_submit():
+        print('Форма валидна')
+        if form.password.data != form.password_again.data:
+            flash("Пароли не совпадают.", 'danger')
+            return render_template('new_registration.html', form=form)
 
-    if form.password.data != form.password_again.data:
-        flash("Пароли не совпадают.", 'danger')
-        return render_template('reg.html', form=form)
-
-    try:
-        async with async_session_maker() as session:
-            async with session.begin():
-                # Проверка существующего пользователя
+        try:
+            async with async_session_maker() as session:
                 existing_user = await UserService.get_one_or_none(session, email=form.email.data)
                 if existing_user:
                     flash("Пользователь с таким email уже существует.", 'danger')
-                    return render_template('reg.html', form=form)
+                    return render_template('new_registration.html', form=form)
 
-                # Создание нового пользователя
-                await UserService.insert(
+                print("Создаем нового пользователя...")
+                new_user = await UserService.insert(
                     session,
                     name=form.name.data,
                     surname=form.surname.data,
                     email=form.email.data,
                     date_of_birth=form.date_of_birth.data,
-                    password=hash_password(form.password.data)
+                    password=hash_password(form.password.data),
+                    is_admin=False
                 )
-
+                print(f"Создан пользователь: {new_user}")
                 flash("Регистрация прошла успешно! Теперь вы можете войти.", 'success')
                 return redirect('/recipe/auth/login')
-    except Exception as e:
-        print(f"Registration error: {e}")
-        flash("Произошла ошибка при регистрации.", 'danger')
-        return render_template('reg.html', form=form), 500
+
+        except Exception as e:
+            print(f"Registration error: {e}")
+            flash("Произошла ошибка при регистрации.", 'danger')
+
+    return render_template('new_registration.html', form=form)
 
 
 @router.route('/logout')
@@ -117,6 +116,5 @@ async def logout():
     response = make_response(redirect('/'))
     response.delete_cookie('auth_token')
     response.delete_cookie('user_id')
-    response.delete_cookie('is_admin')
     flash("Вы вышли из системы.", 'info')
     return response

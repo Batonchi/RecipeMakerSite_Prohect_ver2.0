@@ -17,7 +17,7 @@
             <h2>Регистрация</h2>
         </div>
     </div>
-    <form method="post" enctype="multipart/form-data">
+    <form method="POST" action="{{ url_for('auth.register_handler') }}">
         {{ form.hidden_tag() }}
 
         <label class="form__label" for="name">{{ form.name.label }}</label>
@@ -70,11 +70,16 @@
 
         <p class="agreement">нажимая кнопку зарегистрироватся, я принимаю соглашение о получение информации, оповещений из сервиса через
             стороние службы связи</p>
+
+        <div class="button--reg">
+            {{ form.submit(type="submit", class="btn btn-primary button") }}
+        </div>
     </form>
-    <div class="button--reg">
-        {{ form.submit(type="submit", class="btn btn-primary button") }}
+    {% if message %}
+    <div class="alert alert-info">
+        {{ message }}
     </div>
-    {{message}}
+    {% endif %}
 </div>
 </body>
 </html>
