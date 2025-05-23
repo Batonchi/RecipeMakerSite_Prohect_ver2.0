@@ -1,18 +1,9 @@
 <div class="ingredient block--flex_row">
-    <label class="id_ing">{{ index }}</label>
-    <input type="text"
-           name="ingredients-{{ index }}-name"
-           class="style_font"
-           placeholder="наименование"
-           required>
-    <input type="text"
-           name="ingredients-{{ index }}-for_what"
-           class="style_font"
-           placeholder="для чего">
-    <input type="text"
-           name="ingredients-{{ index }}-quantity"
-           class="style_font"
-           placeholder="кол-во"
-           required>
+    {{ ingredient.hidden_tag() }}
+    <label class="id_ing">{{ index + 1 }}</label>
+    <input type="number" name="ingredients-{{ index }}-number" class="style_font" placeholder="номер" value="{{ ingredient.number.data or '' }}" required>
+    <input type="text" name="ingredients-{{ index }}-name" class="style_font" placeholder="наименование" value="{{ ingredient.name.data or '' }}" required>
+    <input type="text" name="ingredients-{{ index }}-for_what" class="style_font" placeholder="для чего" value="{{ ingredient.for_what.data or '' }}">
+    <input type="number" name="ingredients-{{ index }}-quantity" class="style_font" placeholder="кол-во" value="{{ ingredient.quantity.data or '' }}" required>
     <label class="label__button--delete_ing">x</label>
 </div>

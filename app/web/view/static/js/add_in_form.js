@@ -10,78 +10,121 @@ export class AddInForm {
     }
 
     static initImageHandlers() {
-        // Обработчик для существующих кнопок добавления изображений
-        document.querySelectorAll('.button--add_images').forEach(button => {
-            // Проверяем, что кнопка существует в DOM
-            if (!button || !button.parentNode) return;
-
-            // Клонируем кнопку и заменяем оригинал
-            const newButton = button.cloneNode(true);
-            button.replaceWith(newButton);
-
-            const stepIndex = newButton.getAttribute('data-step-index');
-            newButton.addEventListener('click', function (e) {
-                e.stopPropagation();
-                const fileInput = document.createElement('input');
-                fileInput.type = 'file';
-                fileInput.accept = 'image/*';
-                fileInput.multiple = true;
-
-                fileInput.addEventListener('change', function (e) {
-                    const files = e.target.files;
-                    const container = document.getElementById(`container_graph-${stepIndex}`);
-                    if (!container) return;
-
-                    for (let i = 0; i < files.length; i++) {
-                        const file = files[i];
-                        const reader = new FileReader();
-
-                        reader.onload = function (e) {
-                            const imageDiv = document.createElement('div');
-                            imageDiv.className = 'image-item';
-
-                            const imgPreview = document.createElement('img');
-                            imgPreview.src = e.target.result;
-                            imgPreview.style.maxWidth = '100px';
-                            imgPreview.style.maxHeight = '100px';
-
-                            const deleteButton = document.createElement('button');
-                            deleteButton.textContent = '×';
-                            deleteButton.className = 'delete-image-button';
-                            deleteButton.addEventListener('click', (e) => {
-                                e.stopPropagation();
-                                imageDiv.remove();
-                            });
-
-                            imageDiv.appendChild(imgPreview);
-                            imageDiv.appendChild(deleteButton);
-                            container.appendChild(imageDiv);
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                });
-
-                fileInput.click();
-            });
+        document.addEventListener('click', async (e) => {
+            if (e.target.classList.contains('button--add_images')) {
+                const stepIndex = e.target.dataset.stepIndex;
+                await this.handleImageUpload(stepIndex);
+            }
         });
     }
 
+    static initStepHandlers(stepElement) {
+        const stepIndex = this.getStepIndex(stepElement);
+
+        // Обработчик кнопки добавления ссылки
+        const addLinkButton = stepElement.querySelector('.add--step_link__button');
+        if (addLinkButton) {
+            addLinkButton.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const linkCount = stepElement.querySelectorAll('.link').length;
+                await this.addStepLink(stepIndex, linkCount);
+            });
+        }
+
+        // Обработчик кнопки добавления изображений
+        const addImageButton = stepElement.querySelector('.button--add_images');
+        if (addImageButton) {
+            addImageButton.setAttribute('data-step-index', stepIndex);
+            addImageButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.handleImageUpload(stepIndex);
+            });
+        }
+    }
+
+    static getStepIndex(stepElement) {
+        if (stepElement.hasAttribute('data-step-index')) {
+            return parseInt(stepElement.getAttribute('data-step-index'));
+        }
+
+        const nameAttr = stepElement.querySelector('[name^="steps-"]')?.name;
+        if (nameAttr) {
+            const match = nameAttr.match(/steps-(\d+)/);
+            return match ? parseInt(match[1]) : 0;
+        }
+
+        return 0;
+    }
+
+    static async handleImageUpload(stepIndex) {
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*';
+        fileInput.multiple = true;
+
+        fileInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            const container = document.getElementById(`container_graph-${stepIndex}`);
+
+            if (!container) return;
+
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const imageDiv = document.createElement('div');
+                    imageDiv.className = 'image-item';
+
+                    const img = document.createElement('img');
+                    img.src = event.target.result;
+                    img.style.maxWidth = '100px';
+                    img.style.maxHeight = '100px';
+
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.textContent = '×';
+                    deleteBtn.className = 'delete-image-button';
+                    deleteBtn.addEventListener('click', () => imageDiv.remove());
+
+                    imageDiv.appendChild(img);
+                    imageDiv.appendChild(deleteBtn);
+                    container.appendChild(imageDiv);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        fileInput.click();
+    }
 
     static async addStep(container, index) {
-        const html = await this.fetchTemplate('step', {index});
-        const template = document.createElement('template');
-        template.innerHTML = html.trim();
-        const stepElement = template.content.firstChild;
+        try {
+            const html = await this.fetchTemplate('step', {index});
+            const template = document.createElement('template');
+            template.innerHTML = html.trim();
+            const stepElement = template.content.firstChild;
 
-        // Устанавливаем data-атрибут с индексом
-        stepElement.setAttribute('data-step-index', index);
+            // Устанавливаем индекс шага
+            stepElement.setAttribute('data-step-index', index);
 
-        // Вставляем перед кнопкой добавления
-        container.insertBefore(stepElement, container.querySelector('.add-button'));
+            // Находим контейнер для шагов
+            const stepsContainer = container.querySelector('.steps-container') || container;
 
-        // Инициализация обработчиков для нового шага
-        this.initStepHandlers(stepElement);
-        return stepElement;
+            // Находим кнопку добавления
+            const addButton = stepsContainer.querySelector('.add-button') ||
+                stepsContainer.querySelector('#add_step');
+
+            if (addButton && addButton.parentNode === stepsContainer) {
+                stepsContainer.insertBefore(stepElement, addButton);
+            } else {
+                stepsContainer.appendChild(stepElement);
+            }
+
+            // Инициализируем обработчики
+            this.initStepHandlers(stepElement);
+            return stepElement;
+        } catch (error) {
+            console.error('Error adding step:', error);
+            return null;
+        }
     }
 
     static async addIngredient(container, index) {
@@ -90,13 +133,14 @@ export class AddInForm {
         template.innerHTML = html.trim();
         const ingredientElement = template.content.firstChild;
 
-        // Обновляем номер ингредиента
         const idLabel = ingredientElement.querySelector('.id_ing');
         if (idLabel) idLabel.textContent = index + 1;
 
-        // Обновляем имена полей
         ingredientElement.querySelectorAll('input').forEach(input => {
             input.name = input.name.replace(/ingredients-\d+/, `ingredients-${index}`);
+            if (input.name.includes('for_what') && input.value === 'None') {
+                input.value = '';
+            }
         });
 
         container.appendChild(ingredientElement);
@@ -104,21 +148,33 @@ export class AddInForm {
     }
 
     static async addStepLink(stepIndex, linkIndex) {
-        const stepElement = document.querySelector(`.steps__elem[data-step-index="${stepIndex}"]`);
-        if (!stepElement) return;
+        try {
+            const stepElement = document.querySelector(`.steps__elem[data-step-index="${stepIndex}"]`);
+            if (!stepElement) {
+                console.error(`Step element with index ${stepIndex} not found`);
+                return;
+            }
 
-        const container = stepElement.querySelector('.links--add .container');
-        if (!container) return;
+            const container = stepElement.querySelector('.links--add .container');
+            if (!container) {
+                console.error('Links container not found in step element');
+                return;
+            }
 
-        const html = await this.fetchTemplate('link', {
-            step_index: stepIndex,
-            link_index: linkIndex
-        });
-        const template = document.createElement('template');
-        template.innerHTML = html.trim();
-        const linkElement = template.content.firstChild;
-        container.appendChild(linkElement);
-        return linkElement;
+            const html = await this.fetchTemplate('link', {
+                step_index: stepIndex,
+                link_index: linkIndex
+            });
+
+            const template = document.createElement('template');
+            template.innerHTML = html.trim();
+            const linkElement = template.content.firstChild;
+
+            container.appendChild(linkElement);
+            return linkElement;
+        } catch (error) {
+            console.error('Error adding step link:', error);
+        }
     }
 
     static async addRecipeLink(linkIndex) {
@@ -134,99 +190,13 @@ export class AddInForm {
     }
 
     static initRecipeLinkHandlers() {
-        // Обработчик добавления ссылок рецепта
-        document.querySelector('.hyper_text_link__button')?.addEventListener('click', async () => {
-            const container = document.getElementById('all_links');
-            const linkCount = container.querySelectorAll('.link').length;
-            await this.addRecipeLink(linkCount);
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'add_recipe_link' || e.target.classList.contains('hyper_text_link__button')) {
+                const container = document.getElementById('all_links');
+                const linkCount = container.querySelectorAll('.link').length;
+                this.addRecipeLink(linkCount);
+            }
         });
-
-        // Инициализация обработчиков для существующих ссылок рецепта
-        document.querySelectorAll('#all_links .label__button--delete_link').forEach(button => {
-            button.addEventListener('click', function () {
-                this.closest('.link').remove();
-                AddInForm.updateIndexes();
-            });
-        });
-    }
-
-    static initStepHandlers(stepElement) {
-        const stepIndex = this.getStepIndex(stepElement);
-
-        // Обработчик добавления ссылок для шага
-        const addLinkButton = stepElement.querySelector('.add--step_link__button');
-        if (addLinkButton && addLinkButton.parentNode) {
-            const newLinkButton = addLinkButton.cloneNode(true);
-            addLinkButton.replaceWith(newLinkButton);
-
-            newLinkButton.addEventListener('click', async (e) => {
-                e.stopPropagation();
-                const linkCount = stepElement.querySelectorAll('.link').length;
-                await this.addStepLink(stepIndex, linkCount);
-            });
-        }
-
-        // Обработчик добавления изображений
-        const addImageButton = stepElement.querySelector('.button--add_images');
-        if (addImageButton && addImageButton.parentNode) {
-            const newImageButton = addImageButton.cloneNode(true);
-            newImageButton.setAttribute('data-step-index', stepIndex);
-            addImageButton.replaceWith(newImageButton);
-
-            newImageButton.addEventListener('click', function (e) {
-                e.stopPropagation();
-                const fileInput = document.createElement('input');
-                fileInput.type = 'file';
-                fileInput.accept = 'image/*';
-                fileInput.multiple = true;
-
-                fileInput.addEventListener('change', function (e) {
-                    const files = e.target.files;
-                    const container = document.getElementById(`container_graph-${stepIndex}`);
-                    if (!container) return;
-
-                    for (let i = 0; i < files.length; i++) {
-                        const file = files[i];
-                        const reader = new FileReader();
-
-                        reader.onload = function (e) {
-                            const imageDiv = document.createElement('div');
-                            imageDiv.className = 'image-item';
-
-                            const imgPreview = document.createElement('img');
-                            imgPreview.src = e.target.result;
-                            imgPreview.style.maxWidth = '100px';
-                            imgPreview.style.maxHeight = '100px';
-
-                            const deleteButton = document.createElement('button');
-                            deleteButton.textContent = '×';
-                            deleteButton.className = 'delete-image-button';
-                            deleteButton.addEventListener('click', (e) => {
-                                e.stopPropagation();
-                                imageDiv.remove();
-                            });
-
-                            imageDiv.appendChild(imgPreview);
-                            imageDiv.appendChild(deleteButton);
-                            container.appendChild(imageDiv);
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                });
-
-                fileInput.click();
-            });
-        }
-    }
-
-    static getStepIndex(stepElement) {
-        // Сначала пробуем получить из data-атрибута
-        const dataIndex = stepElement.getAttribute('data-step-index');
-        if (dataIndex) return parseInt(dataIndex);
-
-        // Если нет, то из имени поля
-        const nameAttr = stepElement.querySelector('[name^="steps-"]')?.name;
-        return nameAttr ? parseInt(nameAttr.match(/steps-(\d+)/)[1]) : 0;
     }
 
     static initDeleteHandlers() {
@@ -235,25 +205,34 @@ export class AddInForm {
             if (e.target.classList.contains('step__elem--del')) {
                 e.target.closest('.steps__elem').remove();
                 this.updateIndexes();
+                return;
             }
 
             // Удаление ингредиента
             if (e.target.classList.contains('label__button--delete_ing')) {
                 e.target.closest('.ingredient').remove();
                 this.updateIndexes();
+                return;
             }
 
             // Удаление ссылки
             if (e.target.classList.contains('label__button--delete_link')) {
                 e.target.closest('.link').remove();
                 this.updateIndexes();
+                return;
+            }
+
+            // Удаление изображения
+            if (e.target.classList.contains('delete-image-button')) {
+                e.target.closest('.image-item').remove();
+                return;
             }
         });
     }
 
     static updateIndexes() {
         // Обновление индексов ингредиентов
-        document.querySelectorAll('.ingredient').forEach((ing, idx) => {
+        document.querySelectorAll('#cont_ing .ingredient').forEach((ing, idx) => {
             const idLabel = ing.querySelector('.id_ing');
             if (idLabel) idLabel.textContent = idx + 1;
 
@@ -262,17 +241,15 @@ export class AddInForm {
             });
         });
 
-        // Обновление индексов шагов и их ссылок
-        document.querySelectorAll('.steps__elem').forEach((step, stepIdx) => {
-            // Устанавливаем data-атрибут с индексом
-            step.setAttribute('data-step-index', stepIdx);
+        // Обновление индексов шагов
+        document.querySelectorAll('#cont_steps .steps__elem').forEach((step, stepIdx) => {
+            step.dataset.stepIndex = stepIdx;
 
-            // Обновляем индексы полей шага
             step.querySelectorAll('[name^="steps-"]').forEach(field => {
                 field.name = field.name.replace(/steps-\d+/, `steps-${stepIdx}`);
             });
 
-            // Обновляем индексы контейнеров
+            // Обновляем контейнеры изображений и ссылок
             const containers = step.querySelectorAll('[id^="step_links-"], [id^="container_graph-"]');
             containers.forEach(container => {
                 container.id = container.id.replace(/\d+/, stepIdx);
@@ -281,10 +258,10 @@ export class AddInForm {
             // Обновляем data-атрибуты кнопок
             const buttons = step.querySelectorAll('[data-step-index]');
             buttons.forEach(button => {
-                button.setAttribute('data-step-index', stepIdx);
+                button.dataset.stepIndex = stepIdx;
             });
 
-            // Обновляем индексы ссылок
+            // Обновляем ссылки шага
             step.querySelectorAll('.link').forEach((link, linkIdx) => {
                 link.querySelectorAll('input').forEach(input => {
                     input.name = input.name
@@ -293,64 +270,89 @@ export class AddInForm {
             });
         });
 
-        // Обновление индексов ссылок рецепта
+        // Обновление ссылок рецепта
         document.querySelectorAll('#all_links .link').forEach((link, linkIdx) => {
             link.querySelectorAll('input').forEach(input => {
-                input.name = input.name
-                    .replace(/links-\d+/, `links-${linkIdx}`);
+                input.name = input.name.replace(/links-\d+/, `links-${linkIdx}`);
             });
         });
     }
 
     static async addInitialElements() {
-        // Добавляем первый ингредиент, если контейнер пуст
         const ingredientsContainer = document.getElementById('cont_ing');
         if (ingredientsContainer && ingredientsContainer.children.length === 0) {
             await this.addIngredient(ingredientsContainer, 0);
         }
 
-        // Добавляем первый шаг, если контейнер пуст
-        const stepsContainer = document.querySelector('.steps .block--flex_column');
+        const stepsContainer = document.getElementById('cont_steps');
         if (stepsContainer && stepsContainer.querySelectorAll('.steps__elem').length === 0) {
             await this.addStep(stepsContainer, 0);
         }
 
-        // Добавляем первую ссылку рецепта, если контейнер пуст
         const recipeLinksContainer = document.getElementById('all_links');
         if (recipeLinksContainer && recipeLinksContainer.children.length === 0) {
             await this.addRecipeLink(0);
         }
-
-        // Инициализация обработчиков
-        this.initImageHandlers();
-        this.initRecipeLinkHandlers();
     }
 
     static initAddButtons() {
         // Кнопка добавления ингредиента
-        document.querySelector('.plus_ing')?.addEventListener('click', async () => {
+        document.getElementById('add_ingredient')?.addEventListener('click', async () => {
             const container = document.getElementById('cont_ing');
-            const index = container.children.length;
+            const index = container.querySelectorAll('.ingredient').length;
             await this.addIngredient(container, index);
         });
 
         // Кнопка добавления шага
-        document.querySelector('.steps .add-button')?.addEventListener('click', async () => {
-            const container = document.querySelector('.steps .block--flex_column');
+        document.getElementById('add_step')?.addEventListener('click', async () => {
+            const container = document.getElementById('cont_steps');
             const index = container.querySelectorAll('.steps__elem').length;
             await this.addStep(container, index);
         });
     }
-}
 
-// Инициализация формы при загрузке
-document.addEventListener('DOMContentLoaded', async () => {
-    await AddInForm.addInitialElements();
-    AddInForm.initAddButtons();
-    AddInForm.initDeleteHandlers();
+    static initFormSubmit() {
+        document.querySelector('form')?.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+            formData.append('csrf_token', csrfToken);
 
-    // Инициализация обработчиков для существующих шагов
-    document.querySelectorAll('.steps__elem').forEach(step => {
-        AddInForm.initStepHandlers(step);
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': csrfToken
+                }
+            }).then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                } else {
+                    return response.json();
+                }
+            }).catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    }
+
+    static async init() {
+        await this.addInitialElements();
+        this.initAddButtons();
+        this.initDeleteHandlers();
+        this.initImageHandlers();
+        this.initRecipeLinkHandlers();
+        this.initFormSubmit();
+
+        document.addEventListener('click', async (e) => {
+        if (e.target.classList.contains('add--step_link__button')) {
+            const stepElement = e.target.closest('.steps__elem');
+            if (stepElement) {
+                const stepIndex = this.getStepIndex(stepElement);
+                const linkCount = stepElement.querySelectorAll('.link').length;
+                await this.addStepLink(stepIndex, linkCount);
+            }
+        }
     });
-});
+    }
+}

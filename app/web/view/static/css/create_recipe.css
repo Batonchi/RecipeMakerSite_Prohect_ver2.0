@@ -904,3 +904,58 @@ footer {
 .delete-image-button:hover {
     background: darkred;
 }
+
+.ingredients {
+    overflow: hidden;
+    padding-bottom: 10px;
+}
+
+#cont_ing {
+    width: 100%;
+    max-height: max-content;
+    overflow-y: auto;
+    transform: translateY(-10px);
+    padding: 15px 10px 0 10px;
+}
+
+.ingredient {
+    display: grid;
+    grid-template-columns: 50px 80px 1fr 1fr 80px 40px;
+    gap: 10px;
+    align-items: center;
+    width: 100%;
+    padding: 5px 0;
+    margin: 0;
+}
+
+.ingredient input[type^='number'] {
+    width: 100%;
+    min-height: 50px;
+    box-sizing: border-box;
+    font-style: initial;
+    font-family: inherit;
+    font-size: 20px;
+    font-weight: inherit;
+}
+
+input[type^='number'] {
+    outline: none;
+    border: none;
+}
+
+.ingredient .label__button--delete_ing {
+    min-height: 50px;
+}
+
+#add_ingredient {
+    transform: translateY(10px);
+}
+
+.steps .steps__elem .block--flex_row {
+    min-width: 890px;
+}
+
+
+.steps .steps__elem .block--flex_row .block--flex_column {
+    min-width: 890px;
+}

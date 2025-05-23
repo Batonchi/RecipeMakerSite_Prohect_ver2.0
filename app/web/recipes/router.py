@@ -30,18 +30,32 @@ def graphic_show():
     return render_template('graphic_form.html')
 
 
-@router.route('/get-step-form')
-def get_step_form():
-    index = request.args.get('index', 0)
-    form = RecipeForm()
-    return render_template('step_partial.html', step=form.steps.append_entry(), index=index)
-
-
 @router.route('/get-ingredient-form')
 def get_ingredient_form():
-    index = request.args.get('index', 0)
+    index = request.args.get('index', 0, type=int)
     form = RecipeForm()
-    return render_template('ingredient_partial.html', ingredient=form.ingredients.append_entry(), index=index)
+    ingredient = form.ingredients.append_entry()
+
+    # Устанавливаем пустую строку вместо None
+    if ingredient.for_what.data is None:
+        ingredient.for_what.data = ''
+
+    return render_template('ingredient_partial.html',
+                           ingredient=ingredient,
+                           index=index)
+
+
+@router.route('/get-step-form')
+def get_step_form():
+    index = request.args.get('index', 0, type=int)
+    form = RecipeForm()
+    step = form.steps.append_entry()
+
+    # Добавляем только одну ссылку по умолчанию
+    if not step.links.entries:
+        step.links.append_entry()
+
+    return render_template('step_partial.html', step=step, index=index)
 
 
 @router.route('/get-link-form')
@@ -74,67 +88,66 @@ def run_async(coro):  # функция для асинхронного запу�
 async def create_recipe():
     form = RecipeForm()
     if request.method == 'GET':
-        form.ingredients.entries.clear()
-        form.steps.entries.clear()
+        while form.ingredients:
+            form.ingredients.pop_entry()
+        while form.steps:
+            form.steps.pop_entry()
+        while form.links:
+            form.links.pop_entry()
+
         form.ingredients.append_entry()
-        form.steps.append_entry()
+        step = form.steps.append_entry()
+        # Добавляем только одну ссылку по умолчанию
+        step.links.append_entry()
+        form.links.append_entry()
+
         return render_template('create_recipe_form.html', form=form)
 
-    if form.validate_on_submit():
-        print("Форма валидна, обрабатываем данные...")
-        if form.submit.data:
-            try:
-                current_user = run_async(get_user_by_token())
-                print(f"Пользователь: {current_user.id}")
+    if request.method == 'POST':
+        form = RecipeForm(request.form)
+        if not form.validate():
+            return render_template('create_recipe_form.html', form=form, error="Проверьте заполнение полей")
 
-                recipe_data = {
-                    'name': form.name.data,
-                    'user_id': current_user.id,
-                    'content': {
-                        'theme': form.theme.data,
-                        'description': form.description.data,
-                        'hashtags': [tag.strip() for tag in form.hashtags.data.split('#') if tag.strip()],
-                        'categories': form.categories.data,
-                        'ingredients': [
-                            {
-                                'number': ingredient.data['number'],
-                                'name': ingredient.data['name'],
-                                'for_what': ingredient.data['for_what'],
-                                'quantity': ingredient.data['quantity']
-                            } for ingredient in form.ingredients
-                        ],
-                        'steps': [
-                            {
-                                'number': step.data['number'],
-                                'name': step.data['name'],
-                                'description': step.data['description'],
-                                'explanations': step.data['explanations'],
-                                'links': [
-                                    {
-                                        'link_description': link.data['link_description'],
-                                        'link': link.data['link']
-                                    } for link in step.links
-                                ]
-                            } for step in form.steps
-                        ],
-                        'result': form.result.data,
-                        'result_link': form.result_link.data,
-                        'result_link_description': form.result_link_description.data,
-                        'use_ai_image': form.use_ai_image.data,
-                        'use_ai_text': form.use_ai_text.data
-                    }
+        try:
+            current_user = run_async(get_user_by_token())
+            recipe_data = {
+                'name': form.name.data,
+                'user_id': current_user.id,
+                'content': {
+                    'theme': form.theme.data,
+                    'description': form.description.data,
+                    'hashtags': [tag.strip() for tag in form.hashtags.data.split('#') if tag.strip()],
+                    'categories': form.categories.data,
+                    'ingredients': [
+                        {
+                            'number': ingredient.number.data,
+                            'name': ingredient.name.data,
+                            'for_what': ingredient.for_what.data or '',  # Пустая строка вместо None
+                            'quantity': ingredient.quantity.data
+                        } for ingredient in form.ingredients
+                    ],
+                    'steps': [
+                        {
+                            'number': step.number.data,
+                            'name': step.name.data,
+                            'description': step.description.data,
+                            'explanations': step.explanations.data,
+                            'links': [
+                                {
+                                    'link_description': link.link_description.data,
+                                    'link': link.link.data
+                                } for link in step.links
+                            ]
+                        } for step in form.steps
+                    ],
+                    'result': form.result.data,
+                    'use_ai_image': form.use_ai_image.data,
+                    'use_ai_text': form.use_ai_text.data
                 }
-                print("Данные для сохранения:", recipe_data)
-                future = current_app.executor.submit(
-                    run_async,
-                    RecipeService.add_recipe(**recipe_data)
-                )
-                future.result()
-
-                return redirect('/recipe')
-            except Exception as e:
-                print(f"Ошибка создания рецепта: {e}")
-                return render_template('create_recipe_form.html', form=form, error="Не удалось создать рецепт")
-        elif form.cancel.data:
-            return redirect('/create')
-    return render_template('create_recipe_form.html', form=form)
+            }
+            future = current_app.executor.submit(run_async, RecipeService.add_recipe(**recipe_data))
+            future.result()
+            return redirect(url_for('recipe.index'))
+        except Exception as e:
+            print(f"Ошибка создания рецепта: {e}")
+            return render_template('create_recipe_form.html', form=form, error=str(e))
