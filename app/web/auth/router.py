@@ -70,7 +70,7 @@ async def login_handler():
 # Регистрация
 @router.route('/register', methods=['GET'])
 async def register_page():
-    return render_template('new_registration.html', form=RegisterForm())
+    return render_template('registration.html', form=RegisterForm())
 
 
 @router.route('/register', methods=['GET', 'POST'])
@@ -81,14 +81,14 @@ async def register_handler():
         print('Форма валидна')
         if form.password.data != form.password_again.data:
             flash("Пароли не совпадают.", 'danger')
-            return render_template('new_registration.html', form=form)
+            return render_template('registration.html', form=form)
 
         try:
             async with async_session_maker() as session:
                 existing_user = await UserService.get_one_or_none(session, email=form.email.data)
                 if existing_user:
                     flash("Пользователь с таким email уже существует.", 'danger')
-                    return render_template('new_registration.html', form=form)
+                    return render_template('registration.html', form=form)
 
                 print("Создаем нового пользователя...")
                 new_user = await UserService.insert(
@@ -108,7 +108,7 @@ async def register_handler():
             print(f"Registration error: {e}")
             flash("Произошла ошибка при регистрации.", 'danger')
 
-    return render_template('new_registration.html', form=form)
+    return render_template('registration.html', form=form)
 
 
 @router.route('/logout')

@@ -22,20 +22,16 @@ class RecipeService(BaseService):
     async def add_recipe(cls, **data):
         async with async_session_maker() as session:
             try:
-                print("1")
                 # Проверяем соединение с БД
                 await session.execute(select(1))
-                print("2")
                 # Используем прямой INSERT с RETURNING
                 stmt = insert(Recipe).values(
                     user_id=data.get('user_id'),
                     name=data.get('name'),
                     content=data.get('content')
                 ).returning(Recipe.id)
-                print("3")
                 result = await session.execute(stmt)
                 recipe_id = result.scalar_one()
-                print('4')
                 await session.commit()
                 return recipe_id
 

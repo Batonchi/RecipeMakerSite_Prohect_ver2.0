@@ -6,16 +6,16 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Регистрация</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link href="/static/css/registration.css" rel="stylesheet">
 </head>
 <body>
 <div class="block--background">
     <div class="header">
-        <div class="header__back--custom"></div>
-        <div class="header__text block--flex_column">
-            <h1>PRETTY RECIPEMAKER</h1>
-            <h2>Регистрация</h2>
-        </div>
+        <h1>PRETTY RECIPEMAKER</h1>
+        <h2>Регистрация</h2>
     </div>
     <form method="POST" action="{{ url_for('auth.register_handler') }}">
         {{ form.hidden_tag() }}
@@ -68,8 +68,7 @@
             </p>
         {% endfor %}
 
-        <p class="agreement">нажимая кнопку зарегистрироватся, я принимаю соглашение о получение информации, оповещений из сервиса через
-            стороние службы связи</p>
+        <p class="agreement">нажимая кнопку зарегистрироватся, я принимаю соглашение о получение информации, оповещений из сервиса через стороние службы связи</p>
 
         <div class="button--reg">
             {{ form.submit(type="submit", class="btn btn-primary button") }}

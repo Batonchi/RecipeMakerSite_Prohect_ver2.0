@@ -1,0 +1,158 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 900;
+    font-style: normal;
+    overflow-x: hidden;
+    background-color: #BABAD1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.block--background {
+    background-color: #ffffff;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 500px;
+    padding: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.header h1 {
+    color: #1D2535;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.header h2 {
+    color: #686F95;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form__label {
+    color: #374967;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 20px;
+    border: 2px solid #D8DCED;
+    border-radius: 50px;
+    background-color: #ffffff;
+    font-family: "Montserrat", sans-serif;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #686F95;
+}
+
+.alert {
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 5px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.alert-danger {
+    background-color: #ffebee;
+    color: #c62828;
+    border: 1px solid #ef9a9a;
+}
+
+.alert-info {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #a5d6a7;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #374967;
+    font-size: 14px;
+}
+
+.remember-me input {
+    width: 18px;
+    height: 18px;
+    accent-color: #545B81;
+}
+
+.buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 12px 30px;
+    border-radius: 50px;
+    border: none;
+    font-family: "Montserrat", sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: center;
+    width: 100%;
+}
+
+.btn-primary {
+    background-color: #545B81;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #374967;
+}
+
+.btn-secondary {
+    background-color: #D8DCED;
+    color: #374967;
+}
+
+.btn-secondary:hover {
+    background-color: #BCC1DC;
+}
+
+.message {
+    text-align: center;
+    margin-top: 20px;
+    color: #686F95;
+    font-size: 14px;
+}

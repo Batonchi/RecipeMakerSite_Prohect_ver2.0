@@ -1,32 +1,59 @@
-{% extends "test.html" %}
-
-{% block content %}
-    <h1>Авторизация</h1>
-    <form action="" method="post">
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Авторизация</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+          rel="stylesheet">
+    <link href="/static/css/login.css" rel="stylesheet">
+</head>
+<body>
+<div class="block--background">
+    <div class="header">
+        <h1>PRETTY RECIPEMAKER</h1>
+        <h2>Авторизация</h2>
+    </div>
+    <form method="POST" action="">
         {{ form.hidden_tag() }}
-        <p>
-            {{ form.email.label }}<br>
-            {{ form.email(class="form-control", type="email") }}<br>
-            {% for error in form.email.errors %}
-                <div class="alert alert-danger" role="alert">
-                    {{ error }}
-                </div>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.password.label }}<br>
-            {{ form.password(class="form-control", type="password") }}<br>
-            {% for error in form.password.errors %}
-                <div class="alert alert-danger" role="alert">
-                    {{ error }}
-                </div>
-            {% endfor %}
-        </p>
-        <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
 
-        <p>{{ form.create_account(type="submit", class="btn btn-primary") }}</p>
-        <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+        <label class="form__label" for="email">{{ form.email.label }}</label>
+        {{ form.email(class="form-control", type="email", id="email") }}
+        {% for error in form.email.errors %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+        {% endfor %}
 
-        <div>{{ message }}</div>
+        <label class="form__label" for="password">{{ form.password.label }}</label>
+        {{ form.password(class="form-control", type="password", id="password") }}
+        {% for error in form.password.errors %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+        {% endfor %}
+
+        <div class="remember-me">
+            {{ form.remember_me(id="remember_me") }}
+            <label for="remember_me">{{ form.remember_me.label }}</label>
+        </div>
+
+        <div class="buttons">
+            {{ form.submit(type="submit", class="btn btn-primary") }}
+            <button class="btn btn-secondary">войти как гость</button>
+            {{ form.create_account(type="submit", class="btn btn-secondary") }}
+        </div>
     </form>
-{% endblock %}
+
+    {% if message %}
+        <div class="message">
+            {{ message }}
+        </div>
+    {% endif %}
+</div>
+</body>
+</html>

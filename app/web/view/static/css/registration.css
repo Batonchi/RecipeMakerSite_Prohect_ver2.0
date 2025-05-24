@@ -4,12 +4,127 @@
     box-sizing: border-box;
 }
 
-body {
-    font-weight: 900;
-    font-family: 'Montserrat', sans-serif;
-    font-style: normal;
+html {
+    scroll-behavior: smooth;
 }
 
-.header__back--custom {
-    background: url("../../static/images/reg/corner_style_block.svg") no-repeat;
+body {
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 900;
+    font-style: normal;
+    overflow-x: hidden;
+    background-color: #BABAD1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.block--background {
+    background-color: #ffffff;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 500px;
+    padding: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.header h1 {
+    color: #1D2535;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.header h2 {
+    color: #686F95;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form__label {
+    color: #374967;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 20px;
+    border: 2px solid #D8DCED;
+    border-radius: 50px;
+    background-color: #ffffff;
+    font-family: "Montserrat", sans-serif;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #686F95;
+}
+
+.alert {
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 5px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.alert-danger {
+    background-color: #ffebee;
+    color: #c62828;
+    border: 1px solid #ef9a9a;
+}
+
+.alert-info {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #a5d6a7;
+}
+
+.agreement {
+    color: #959BBA;
+    font-size: 12px;
+    text-align: center;
+    margin: 20px 0;
+    line-height: 1.4;
+}
+
+.button--reg {
+    text-align: center;
+}
+
+.btn {
+    padding: 12px 30px;
+    border-radius: 50px;
+    border: none;
+    font-family: "Montserrat", sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background-color: #545B81;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #374967;
 }
