@@ -44,139 +44,198 @@
                 <p class="close_text">вы всегда можете приостановить процесс создания рецепта, либо уничтожить</p>
             </section>
             <form method="POST" enctype="multipart/form-data"
+                  action="{{ url_for('form.create_recipe') }}"
                   class="main_form section--bg_colour--border block--flex_column">
                 {{ form.hidden_tag() }}
                 <h2 class="header_2">Форма</h2>
                 <div class="grid_textarea_custom_label">
                     <div class="label--bg_color border_top">наименование</div>
                     {{ form.name(class="input_name border_top no-resize textarea_form", required="required") }}
+                    {% if form.name.errors %}
+                        <div class="error-message">{{ form.name.errors[0] }}</div>
+                    {% endif %}
+
                     <div class="border_bottom label--bg_color">тема</div>
                     {{ form.theme(class="input_theme border_bottom no-resize textarea_form", required="required") }}
+                    {% if form.theme.errors %}
+                        <div class="error-message">{{ form.theme.errors[0] }}</div>
+                    {% endif %}
+
                     <div class="border_top label--bg_color">описание</div>
                     {{ form.description(class="input_description border_top no-resize textarea_form", required="required") }}
+                    {% if form.description.errors %}
+                        <div class="error-message">{{ form.description.errors[0] }}</div>
+                    {% endif %}
+
                     <div class="border_bottom label--bg_color">хэштеги</div>
                     {{ form.hashtags(class="input_hashtags border_bottom no-resize textarea_form") }}
+                    {% if form.hashtags.errors %}
+                        <div class="error-message">{{ form.hashtags.errors[0] }}</div>
+                    {% endif %}
                 </div>
+
                 <label class="select_category border_top" type="header">выберите категорию рецепта</label>
                 {{ form.categories(class="d-none select_category select_category_option border_bottom") }}
+                {% if form.categories.errors %}
+                    <div class="error-message">{{ form.categories.errors[0] }}</div>
+                {% endif %}
+
+                <!-- Ингредиенты -->
                 <div class="ingredients block--flex_column">
                     <h2 class="header_2">Ингредиенты</h2>
                     <div class="block--flex_column" id="cont_ing">
                         {% for ingredient in form.ingredients %}
                             <div class="ingredient block--flex_row">
+                                {{ ingredient.hidden_tag() }}
                                 <label class="id_ing">{{ loop.index }}</label>
-                                <input type="text"
-                                       name="{{ ingredient.name.name }}"
-                                       class="style_font"
-                                       placeholder="наименование"
-                                       value="{{ ingredient.name.data or '' }}">
-                                <input type="text"
-                                       name="{{ ingredient.for_what.name }}"
-                                       class="style_font"
-                                       placeholder="для чего"
-                                       value="{{ ingredient.for_what.data or '' }}">
-                                <input type="text"
-                                       name="{{ ingredient.quantity.name }}"
-                                       class="style_font"
-                                       placeholder="кол-во"
-                                       value="{{ ingredient.quantity.data or '' }}">
+                                <input type="number" name="ingredients-{{ loop.index0 }}-number" class="style_font"
+                                       placeholder="номер" value="{{ ingredient.number.data or 1 }}" required>
+                                {% if ingredient.number.errors %}
+                                    <div class="error-message">{{ ingredient.number.errors[0] }}</div>
+                                {% endif %}
+
+                                <input type="text" name="ingredients-{{ loop.index0 }}-name" class="style_font"
+                                       placeholder="наименование" value="{{ ingredient.name.data or '' }}" required>
+                                {% if ingredient.name.errors %}
+                                    <div class="error-message">{{ ingredient.name.errors[0] }}</div>
+                                {% endif %}
+
+                                <input type="text" name="ingredients-{{ loop.index0 }}-for_what" class="style_font"
+                                       placeholder="для чего" value="{{ ingredient.for_what.data or '' }}">
+
+                                <input type="number" name="ingredients-{{ loop.index0 }}-quantity" class="style_font"
+                                       placeholder="кол-во" value="{{ ingredient.quantity.data or 1 }}" required>
+                                {% if ingredient.quantity.errors %}
+                                    <div class="error-message">{{ ingredient.quantity.errors[0] }}</div>
+                                {% endif %}
+
                                 <label class="label__button--delete_ing">x</label>
                             </div>
                         {% endfor %}
                     </div>
-                    <button class="plus_ing border_bottom" type="button">+</button>
+                    <button class="plus_ing border_bottom" type="button" id="add_ingredient">+</button>
                 </div>
 
+                <!-- Шаги -->
                 <div class="steps border_top border_bottom">
                     <div class="header__text border_top">
                         <h2 class="header_2">Этапы</h2>
                     </div>
-                    <div class="block--flex_column">
-                        {% for step in form.steps %}
-                            <div class="steps__elem" data-step-index="0">
-                                <div class="block--flex_row">
-                                    <div class="block--flex_column">
-                                        <div class="grid_input_custom_label var_grid_1">
-                                            <div class="label_back border_bottom_right_top_left">имя</div>
-                                            <input type="text"
-                                                   name="{{ step.name.name }}"
-                                                   class="border_bottom style_font limit_width_input"
-                                                   required
-                                                   value="{{ step.name.data or '' }}">
-                                            <div class="border_bottom label_back">номер</div>
-                                            <input type="text"
-                                                   name="{{ step.number.name }}"
-                                                   class="style_font border_top_right_bottom_left limit_width_input"
-                                                   required
-                                                   value="{{ step.number.data or '' }}">
-                                        </div>
-                                        <div class="grid_input_custom_label var_grid_2">
-                                            <div class="label_back border_right">описание</div>
-                                            <textarea name="{{ step.description.name }}"
-                                                      class="style_font border_left"
-                                                      required
-                                                      style="resize: none; border: none">{{ step.description.data or '' }}</textarea>
-                                            <div class="label_back border_top_right_bottom_left">пояснение</div>
-                                            <textarea name="{{ step.explanations.name }}"
-                                                      class="style_font border_bottom_right_top_left"
-                                                      required
-                                                      style="resize: none; border: none">{{ step.explanations.data or '' }}</textarea>
-                                        </div>
-                                        <div class="step--add_graphic border_top border_bottom">
-                                            <div class="border_bottom border_top container">
-                                                выберите графическую составляющую этапа
-                                                <div id="container_graph-{{ loop.index0 }}"
-                                                     class="images-container"></div>
+                    <div class="block--flex_column" id="cont_steps">
+                        <div class="steps-container">
+                            {% for step in form.steps %}
+                                <div class="steps__elem" data-step-index="{{ loop.index0 }}">
+                                    {{ step.hidden_tag() }}
+                                    <div class="block--flex_row">
+                                        <div class="block--flex_column">
+                                            <div class="grid_input_custom_label var_grid_1">
+                                                <div class="label_back border_bottom_right_top_left">имя</div>
+                                                <input type="text"
+                                                       name="steps-{{ loop.index0 }}-name"
+                                                       class="border_bottom style_font limit_width_input"
+                                                       value="{{ step.name.data or '' }}" required>
+                                                {% if step.name.errors %}
+                                                    <div class="error-message">{{ step.name.errors[0] }}</div>
+                                                {% endif %}
+
+                                                <div class="border_bottom label_back">номер</div>
+                                                <input type="number"
+                                                       name="steps-{{ loop.index0 }}-number"
+                                                       class="style_font border_top_right_bottom_left limit_width_input"
+                                                       value="{{ step.number.data or 1 }}" required>
+                                                {% if step.number.errors %}
+                                                    <div class="error-message">{{ step.number.errors[0] }}</div>
+                                                {% endif %}
                                             </div>
-                                            <button class="border_bottom button--add_images" type="button"
-                                                    data-step-index="{{ loop.index0 }}">+
-                                            </button>
-                                        </div>
-                                        <div class="step--add_links links--add border_bottom border_top">
-                                            <div class="container border_bottom border_top" id="step_links">
-                                                <div class="link">
-                                                    <input type="text"
-                                                           name="{{ step.links[0].link_description.name }}"
-                                                           placeholder="куда ведет"
-                                                           class="where border_bottom border_top"
-                                                           required
-                                                           value="{{ step.links[0].link_description.data or '' }}">
-                                                    <input type="text"
-                                                           name="{{ step.links[0].link.name }}"
-                                                           placeholder="ссылка"
-                                                           class="link_str border_bottom border_top"
-                                                           required
-                                                           value="{{ step.links[0].link.data or '' }}">
-                                                    <label class="label__button--delete_link">x</label>
+                                            <div class="grid_input_custom_label var_grid_2">
+                                                <div class="label_back border_right">описание</div>
+                                                <textarea name="steps-{{ loop.index0 }}-description"
+                                                          class="style_font border_left"
+                                                          style="resize: none; border: none"
+                                                          required>{{ step.description.data or '' }}</textarea>
+                                                {% if step.description.errors %}
+                                                    <div class="error-message">{{ step.description.errors[0] }}</div>
+                                                {% endif %}
+
+                                                <div class="label_back border_top_right_bottom_left">пояснение</div>
+                                                <textarea name="steps-{{ loop.index0 }}-explanations"
+                                                          class="style_font border_bottom_right_top_left"
+                                                          style="resize: none; border: none">{{ step.explanations.data or '' }}</textarea>
+                                            </div>
+                                            <div class="step--add_graphic border_top border_bottom" style="text-align: center">
+                                                <div class="border_bottom border_top container">
+                                                    выберите графическую составляющую этапа, где одна картинка не превышает 16мб
+                                                    <div id="container_graph-{{ loop.index0 }}"
+                                                         class="images-container"></div>
                                                 </div>
+                                                <button class="border_bottom button--add_images" type="button"
+                                                        data-step-index="{{ loop.index0 }}">+
+                                                </button>
                                             </div>
-                                            <div class="between_link_and_add border_bottom border_top">нажмите +,
-                                                чтобы
-                                                добавить ссылку
+                                            <div class="step--add_links links--add border_bottom border_top">
+                                                <div class="container border_bottom border_top"
+                                                     id="step_links-{{ loop.index0 }}">
+                                                    {% for link in step.links %}
+                                                        <div class="link">
+                                                            {{ link.hidden_tag() }}
+                                                            <input type="text"
+                                                                   name="steps-{{ loop.index0 }}-links-{{ loop.index0 }}-link_description"
+                                                                   placeholder="куда ведет"
+                                                                   class="where border_bottom border_top"
+                                                                   value="{{ link.link_description.data or '' }}">
+                                                            <input type="text"
+                                                                   name="steps-{{ loop.index0 }}-links-{{ loop.index0 }}-link"
+                                                                   placeholder="ссылка"
+                                                                   class="link_str border_bottom border_top"
+                                                                   value="{{ link.link.data or '' }}">
+                                                            <label class="label__button--delete_link">x</label>
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+                                                <div class="between_link_and_add border_bottom border_top">нажмите +,
+                                                    чтобы добавить ссылку
+                                                </div>
+                                                <button class="add--step_link__button border_bottom" type="button"
+                                                        data-step-index="{{ loop.index0 }}">+
+                                                </button>
                                             </div>
-                                            <button class="add--step_link__button border_bottom" type="button">+
-                                            </button>
                                         </div>
+                                        <button class="step__elem--del" type="button">x</button>
                                     </div>
-                                    <button class="step__elem--del" type="button">x</button>
                                 </div>
-                            </div>
-                        {% endfor %}
-                        <button class="add-button border_bottom" type="button">+</button>
+                            {% endfor %}
+                        </div>
+                        <button class="add-button border_bottom" type="button" id="add_step">+</button>
                     </div>
                 </div>
+
+                <!-- Результат -->
                 <div class="result">
                     <div class="grid_result">
                         <h2 class="header_2">Результат</h2>
                         {{ form.result(placeholder="напишите о том, что должно получится", class="result_textarea") }}
+                        {% if form.result.errors %}
+                            <div class="error-message">{{ form.result.errors[0] }}</div>
+                        {% endif %}
                     </div>
                 </div>
+
+                <!-- Ссылки рецепта -->
                 <div class="hyper_text links--add border_bottom border_top">
                     <div class="container border_bottom border_top" id="all_links">
                         {% for link in form.links %}
                             <div class="link">
-                                {{ link.link_description(placeholder="куда ведет", class="where border_bottom border_top") }}
-                                {{ link.link(placeholder="ссылка", class="link_str border_bottom border_top") }}
+                                {{ link.hidden_tag() }}
+                                <input type="text"
+                                       name="links-{{ loop.index0 }}-link_description"
+                                       placeholder="куда ведет"
+                                       class="where border_bottom border_top"
+                                       value="{{ link.link_description.data or '' }}">
+                                <input type="text"
+                                       name="links-{{ loop.index0 }}-link"
+                                       placeholder="ссылка"
+                                       class="link_str border_bottom border_top"
+                                       value="{{ link.link.data or '' }}">
                                 <label class="label__button--delete_link">x</label>
                             </div>
                         {% endfor %}
@@ -184,43 +243,63 @@
                     <div class="between_link_and_add border_bottom border_top">
                         нажмите +, чтобы добавить ссылку
                     </div>
-                    <button class="hyper_text_link__button border_bottom" type="button">+</button>
+                    <button class="hyper_text_link__button border_bottom" type="button" id="add_recipe_link">+</button>
                 </div>
+
                 <div class="block--flex_row agree">
                     {{ form.use_ai_image(class="checkbox") }}
-                    <label for="agree_neiro_for_photo">использовать нейросети для генерации фото</label>
+                    <label for="use_ai_image">использовать нейросети для генерации фото (Необязательно)</label>
                 </div>
                 <div class="block--flex_row agree">
                     {{ form.use_ai_text(class="checkbox") }}
-                    <label for="agree_neiro_for_text">использовать нейросети для проверки и улучшения текста</label>
+                    <label for="use_ai_text">использовать нейросети для проверки и улучшения текста</label>
                 </div>
+
                 <div class="grid_main_buttons">
                     {{ form.cancel(class="cancel_button border_bottom main_button") }}
                     {{ form.submit(class="confirm_button border_bottom main_button") }}
+                </div>
+
+                {% if form.errors %}
+                    <div class="errors">
+                        {% for field, errors in form.errors.items() %}
+                            {% for error in errors %}
+                                <p>{{ field }}: {{ error }}</p>
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <div id="loading-wave" class="loading-wave" style="display: none;">
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                </div>
+                <div id="form-errors" class="form-errors" style="display: none;">
+                    <h3>Ошибки в форме:</h3>
+                    <ul id="error-list"></ul>
                 </div>
             </form>
         </div>
     </div>
 {% endblock main_content %}
+
 {% block scripts %}
     <script type="module">
         import {DecorativeWaveElement} from '/static/js/decor_create_recipe_page.js';
-        import {AddInForm} from '/static/js/add_in_form.js';
+        import {AddInForm} from "/static/js/add_in_form.js";
 
+        // Инициализация декоративных элементов
         let where = document.getElementById('back_plus_waves');
-        let decor_wave_1 = new DecorativeWaveElement(
-            165, 970, 0, 2, where
-        );
-        let decor_wave_2 = new DecorativeWaveElement(
-            165, 970, 0, 1, where
-        );
+        let decor_wave_1 = new DecorativeWaveElement(165, 970, 0, 2, where);
+        let decor_wave_2 = new DecorativeWaveElement(165, 970, 0, 1, where);
 
         decor_wave_1.show(1, 1, 1);
         decor_wave_2.show(1, 3, 0);
 
         const observer = new ResizeObserver((entries) => {
             for (const entry of entries) {
-                const {width, height} = entry.contentRect
+                const {width, height} = entry.contentRect;
                 let cont_elem = document.getElementById('back_plus_waves');
                 cont_elem.removeChild(cont_elem.firstChild);
                 cont_elem.removeChild(cont_elem.lastChild);
@@ -229,25 +308,13 @@
                 decor_wave_2.show((Math.round(size_elem.height / decor_wave_2.height)), 3, 0);
             }
         });
-        document.addEventListener('DOMContentLoaded', (event) => {
-            document.querySelector('.confirm_button').addEventListener('click',  (event) => {
-                let result = fetch('/recipe/form/create', {
-                    method: 'POST'
-                })
-                result.then((result) => {
-                    alert(result.status)
-                })
+        document.addEventListener('DOMContentLoaded', (e) => {
+            document.querySelector('.button--scroll-up').addEventListener('click', () => {
+                document.getElementById('back').scrollTo({top: 0, behavior: 'smooth'})
             })
-            document.querySelectorAll('.button--scroll-up').forEach(button => {
-                button.addEventListener('click', () => {
-                    document.getElementById('back').scrollTo({
-                        top: 0,
-                        behavior: 'smooth'  // Добавляем плавную прокрутку
-                    });
-                });
-            });
             observer.observe(document.getElementById('back'));
-        });
+            AddInForm.init();
+        })
     </script>
 {% endblock scripts %}
 </body>

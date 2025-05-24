@@ -904,3 +904,177 @@ footer {
 .delete-image-button:hover {
     background: darkred;
 }
+
+.ingredients {
+    overflow: hidden;
+    padding-bottom: 10px;
+}
+
+#cont_ing {
+    width: 100%;
+    max-height: max-content;
+    overflow-y: auto;
+    transform: translateY(-10px);
+    padding: 15px 10px 0 10px;
+}
+
+.ingredient {
+    display: grid;
+    grid-template-columns: 50px 80px 1fr 1fr 80px 40px;
+    gap: 10px;
+    align-items: center;
+    width: 100%;
+    padding: 5px 0;
+    margin: 0;
+}
+
+.ingredient input[type^='number'] {
+    width: 100%;
+    min-height: 50px;
+    box-sizing: border-box;
+    font-style: initial;
+    font-family: inherit;
+    font-size: 20px;
+    font-weight: inherit;
+}
+
+.steps input[type^='number'] {
+    width: 100%;
+    min-height: 50px;
+    box-sizing: border-box;
+    font-style: initial;
+    font-family: inherit;
+    font-size: 20px;
+    padding: 10px 15px;
+    font-weight: inherit;
+}
+
+input[type^='number'] {
+    outline: none;
+    border: none;
+}
+
+.ingredient .label__button--delete_ing {
+    min-height: 50px;
+}
+
+#add_ingredient {
+    transform: translateY(10px);
+}
+
+.steps .steps__elem .block--flex_row {
+    min-width: 890px;
+}
+
+
+.steps .steps__elem .block--flex_row .block--flex_column {
+    min-width: 890px;
+}
+
+/* Индикатор загрузки */
+.loading-wave {
+    transform: translateY(30px);
+    width: 100%;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    margin: 20px 0;
+}
+
+.wave {
+    width: 10px;
+    height: 20px;
+    background: linear-gradient(45deg, #686F95, #959BBA);
+    margin: 0 3px;
+    border-radius: 5px;
+    animation: wave 1s linear infinite;
+}
+
+.wave:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.wave:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+.wave:nth-child(4) {
+    animation-delay: 0.3s;
+}
+
+@keyframes wave {
+    0%, 100% {
+        height: 20px;
+    }
+    50% {
+        height: 60px;
+    }
+}
+
+/* Стили для ошибок */
+.form-errors {
+    background-color: #ffebee;
+    border-left: 4px solid #f44336;
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 4px;
+}
+
+.form-errors h3 {
+    color: #f44336;
+    margin-top: 0;
+}
+
+#error-list {
+    list-style-type: none;
+    padding-left: 0;
+    margin-bottom: 0;
+}
+
+#error-list li {
+    padding: 5px 0;
+    color: #d32f2f;
+}
+
+.error-field {
+    border: 2px solid #f44336 !important;
+    background-color: #ffebee !important;
+}
+
+.error-message {
+    color: #f44336;
+    font-size: 0.8em;
+    margin-top: 5px;
+}
+
+.error-field {
+    border: 2px solid #ff4444 !important;
+    background-color: #ffeeee !important;
+    animation: pulse 0.5s ease-in-out;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+.error-message {
+    color: #ff4444;
+    font-size: 0.85em;
+    margin-top: 5px;
+    padding: 3px 8px;
+    background-color: #ffeeee;
+    border-radius: 3px;
+}
+
+.error-field {
+    border: 2px solid red !important;
+}
+
+.error-message {
+    color: red;
+    font-size: 0.8em;
+    margin-top: 5px;
+}

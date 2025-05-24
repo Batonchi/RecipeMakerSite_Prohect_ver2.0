@@ -24,3 +24,7 @@ NOTIFICATION_MAIL_PASSWORD = os.environ.get('NOTIFICATION_MAIL_PASSWORD')
 SUPPORT_MAIL_PASSWORD = os.environ.get('SUPPORT_MAIL_PASSWORD')
 
 DATABASE_URL = f'postgresql+asyncpg://{USER}:{PASSWORD}@{HOST}:{PORT}/{DBNAME}'
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+MAX_CONTENT_LENGTH = 16 * 1024 * 1024
+IMAGE_FOLDER = 'app/web/view/static/user_images'

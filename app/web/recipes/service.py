@@ -1,3 +1,6 @@
+from flask import current_app
+from sqlalchemy.exc import SQLAlchemyError
+
 from app.base.service import BaseService
 from app.web.recipes.model import Recipe
 from app.base.database import async_session_maker
@@ -6,6 +9,10 @@ from app.base.service import BaseService
 from app.base.database import async_session_maker
 from sqlalchemy import insert, select
 import asyncio
+import logging
+
+logging.basicConfig(level=logging.INFO, filename="py_log_db.log", filemode="w")
+logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
 
 class RecipeService(BaseService):
@@ -13,19 +20,29 @@ class RecipeService(BaseService):
 
     @classmethod
     async def add_recipe(cls, **data):
-        """Асинхронный метод для добавления нового рецепта в базу данных."""
         async with async_session_maker() as session:
             try:
-                print("Пытаемся сохранить рецепт:", data)  # Логирование
-                stmt = insert(cls.model).values(**data)
+                print("1")
+                # Проверяем соединение с БД
+                await session.execute(select(1))
+                print("2")
+                # Используем прямой INSERT с RETURNING
+                stmt = insert(Recipe).values(
+                    user_id=data.get('user_id'),
+                    name=data.get('name'),
+                    content=data.get('content')
+                ).returning(Recipe.id)
+                print("3")
                 result = await session.execute(stmt)
+                recipe_id = result.scalar_one()
+                print('4')
                 await session.commit()
-                print("Рецепт успешно сохранён, ID:", result.inserted_primary_key)
-                return True
+                return recipe_id
+
             except Exception as e:
                 await session.rollback()
-                print("Ошибка при сохранении рецепта:", str(e))
-                raise e
+                current_app.logger.error(f"Database error: {str(e)}")
+                return False
 
     @classmethod
     async def get_one_or_none(cls, **filters):
