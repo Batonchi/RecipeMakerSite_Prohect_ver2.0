@@ -12,6 +12,7 @@ def create_app():
                 template_folder=os.path.abspath('app/web/view/templates'))
 
     app.secret_key = SECRET_KEY
+    app.config['WTF_CSRF_ENABLED'] = False
 
     # Импорт и регистрация blueprint'ов
     from app.web.auth.router import router as auth_router
@@ -25,6 +26,6 @@ def create_app():
 
     @app.route('/', methods=['GET', 'POST'])
     def index():
-        return render_template('create_recipe_form.html', form=RecipeForm(), title='Создание Рецепта')
+        return render_template('menu.html')
 
     return app

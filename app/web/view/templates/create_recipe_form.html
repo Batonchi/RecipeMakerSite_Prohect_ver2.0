@@ -230,6 +230,14 @@
             }
         });
         document.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelector('.confirm_button').addEventListener('click',  (event) => {
+                let result = fetch('/recipe/form/create', {
+                    method: 'POST'
+                })
+                result.then((result) => {
+                    alert(result.status)
+                })
+            })
             document.querySelectorAll('.button--scroll-up').forEach(button => {
                 button.addEventListener('click', () => {
                     document.getElementById('back').scrollTo({
