@@ -19,7 +19,7 @@ def login_required(f):
         auth_token = request.cookies.get('auth_token')
         if not auth_token:
             flash('Пожалуйста, войдите в систему', 'danger')
-            return redirect('recipe/auth/login')
+            return redirect('/recipe/auth/login')
         return f(*args, **kwargs)
 
     return wrapper
@@ -35,6 +35,7 @@ async def login_page():
 async def login_handler():
     form = LoginForm()
 
+    # если нажата кнопка "создать аккаунт"
     if form.create_account.data:
         return redirect('/recipe/auth/register')
 
@@ -43,13 +44,13 @@ async def login_handler():
         return render_template('login.html', form=form)
 
     try:
-        async with async_session_maker() as session:
+        async with async_session_maker() as session:  # сессия
             async with session.begin():
                 email = form.email.data
                 password = form.password.data
-                user = await UserService.get_one_or_none(session, email=email)
+                user = await UserService.get_one_or_none(session, email=email)  # получаем none или юзера (почту)
 
-                if not user or user.password != hash_password(password):
+                if not user or user.password != hash_password(password):  # если что-то не так, то до свидания
                     flash("Неверный email или пароль.", 'danger')
                     return render_template('login.html', form=form)
 
@@ -58,7 +59,6 @@ async def login_handler():
                 response = make_response(redirect('/recipe'))
                 response.set_cookie('auth_token', token, httponly=True)
                 response.set_cookie('user_id', str(user.id))
-                response.set_cookie('is_admin', str(int(user.is_admin)))
 
                 await session.close()
                 return response
@@ -90,7 +90,6 @@ async def register_handler():
                     flash("Пользователь с таким email уже существует.", 'danger')
                     return render_template('registration.html', form=form)
 
-                print("Создаем нового пользователя...")
                 new_user = await UserService.insert(
                     session,
                     name=form.name.data,
@@ -100,7 +99,7 @@ async def register_handler():
                     password=hash_password(form.password.data),
                     is_admin=False
                 )
-                print(f"Создан пользователь: {new_user}")
+                print(new_user)
                 flash("Регистрация прошла успешно! Теперь вы можете войти.", 'success')
                 return redirect('/recipe/auth/login')
 
@@ -116,5 +115,6 @@ async def logout():
     response = make_response(redirect('/'))
     response.delete_cookie('auth_token')
     response.delete_cookie('user_id')
+
     flash("Вы вышли из системы.", 'info')
     return response

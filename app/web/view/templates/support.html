@@ -1,106 +1,139 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Отправить жалобу</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #BABAD1;
-            color: #545B81;
-        }
-        .complaint-card {
-            max-width: 800px;
-            margin: 2rem auto;
-            box-shadow: 0 0.5rem 1rem rgba(104, 111, 149, 0.3);
-            border: none;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        .card-header {
-            background-color: #686F95;
-            color: white;
-        }
-        .navbar {
-            background-color: #545B81 !important;
-        }
-        .btn-primary {
-            background-color: #797f9f;
-            border-color: #686F95;
-        }
-        .btn-primary:hover {
-            background-color: #686F95;
-            border-color: #545B81;
-        }
-        .form-control:focus {
-            border-color: #797f9f;
-            box-shadow: 0 0 0 0.25rem rgba(149, 155, 186, 0.63);
-        }
-        footer {
-            background-color: #545B81 !important;
-        }
-        .alert {
-            border: none;
-        }
-    </style>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
-            <a class="navbar-brand" href="/">Pretty Recipe Maker</a>
-            <div class="navbar-nav">
-                <a class="nav-link" href="/support/create">Поддержка</a>
-            </div>
-        </div>
-    </nav>
+{% extends "base.html" %}
 
-    <div class="container">
+{% block title %}Отправить жалобу{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: "Montserrat", sans-serif;
+        font-optical-sizing: auto;
+        font-weight: 900;
+        font-style: normal;
+        background-color: #BABAD1;
+        color: #545B81;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .complaint-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 2rem 0;
+    }
+
+    .complaint-card {
+        font-weight: 900;
+        max-width: 800px;
+        margin: 0 auto;
+        width: 100%;
+        box-shadow: 0 0.5rem 1rem rgba(104, 111, 149, 0.3);
+        border: none;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .card-header {
+        font-family: "Arial Black", sans-serif;
+        font-weight: 900;
+        background-color: #686F95;
+        color: white;
+        padding: 1.5rem;
+    }
+
+    .card-body {
+        font-weight: 900;
+        padding: 2rem;
+    }
+
+    .btn-primary {
+        background-color: #797f9f;
+        border-color: #686F95;
+        font-weight: 900;
+    }
+
+    .btn-primary:hover {
+        font-weight: 900;
+        background-color: #686F95;
+        border-color: #545B81;
+    }
+
+    .form-control:focus {
+        font-weight: 900;
+        border-color: #797f9f;
+        box-shadow: 0 0 0 0.25rem rgba(149, 155, 186, 0.63);
+    }
+
+    .page-alerts {
+        font-weight: 900;
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        max-width: 400px;
+    }
+
+    .page-alerts .alert {
+        border: none;
+        font-weight: 900;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="complaint-container">
+    <div class="page-alerts">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show mt-3">
+                    <div class="alert alert-{{ category }} alert-dismissible fade show mb-3">
                         {{ message }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
-
-        <div class="card complaint-card mt-4">
-            <div class="card-header">
-                <h4 class="mb-0">Отправить жалобу</h4>
-            </div>
-            <div class="card-body">
-                <form method="POST">
-                    {{ form.hidden_tag() }}
-                    <div class="mb-3">
-                        <label for="{{ form.text.id }}" class="form-label">Текст жалобы</label>
-                        {{ form.text(class="form-control", rows=5) }}
-                        {% if form.text.errors %}
-                            <div class="invalid-feedback d-block">
-                                {% for error in form.text.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            Отправить жалобу
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
     </div>
 
-    <footer class="py-3 mt-5">
-        <div class="container text-center">
-            <p class="mb-0">&copy; 2025 Pretty Recipe Maker. Все права защищены.</p>
+    <div class="card complaint-card">
+        <div class="card-header">
+            <h4 class="mb-0">Отправить жалобу</h4>
         </div>
-    </footer>
+        <div class="card-body">
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                    <label for="{{ form.text.id }}" class="form-label">Текст жалобы</label>
+                    {{ form.text(class="form-control", rows=5) }}
+                    {% if form.text.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.text.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        Отправить жалобу
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.page-alerts .alert');
+            alerts.forEach(function(alert) {
+                var bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    });
+</script>
+{% endblock %}

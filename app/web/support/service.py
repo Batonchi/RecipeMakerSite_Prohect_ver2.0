@@ -1,7 +1,7 @@
 from app.base.service import BaseService
 from app.base.database import async_session_maker
 from app.web.support.model import Complaint
-from sqlalchemy import select, func
+from sqlalchemy import select, func, desc
 
 
 class ComplaintService(BaseService):
@@ -16,7 +16,25 @@ class ComplaintService(BaseService):
             await session.refresh(complaint)
             return complaint
 
-    @classmethod
+    # @classmethod
+    # async def create_complaint(cls, user_id: int, text: str) -> dict:
+    #     async with async_session_maker() as session:
+    #         complaint = cls.model(
+    #             user_id=user_id,
+    #             text=text,
+    #             is_solved=False
+    #         )
+    #         session.add(complaint)
+    #         await session.commit()
+    #         await session.refresh(complaint)
+    #         return {
+    #             'id': complaint.id,
+    #             'user_id': complaint.user_id,
+    #             'text': complaint.text,
+    #             'date_pushed': complaint.date_pushed,
+    #             'is_solved': complaint.is_solved
+    #         }
+
     async def get_user_complaints(cls, user_id):
         return await cls.get_any(user_id=user_id)
 
