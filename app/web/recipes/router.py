@@ -1,5 +1,11 @@
-from flask import Blueprint, render_template, request, redirect, url_for
-from app.web.recipes.forms import RecipeForm, IngredientForm, StepForm
+import json
+import uuid
+import os
+import asyncio
+import logging
+
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify
+from app.web.recipes.forms import RecipeForm, IngredientForm, StepForm, LinkForm
 from app.web.recipes.service import RecipeService
 from app.base.database import async_session_maker
 from flask import Blueprint, current_app, \
@@ -10,8 +16,11 @@ from app.base.database import async_session_maker
 from app.web.auth.service import get_user_by_token
 from flask_executor import Executor
 from werkzeug.exceptions import HTTPException
-import os
-import asyncio
+from flask import jsonify
+from app.base.constant import ALLOWED_EXTENSIONS, IMAGE_FOLDER, MAX_CONTENT_LENGTH
+
+
+logging.basicConfig(level=logging.INFO, filename="py_log.log", filemode="w")
 
 router = Blueprint('form', __name__,
                    url_prefix='/form',
@@ -28,6 +37,65 @@ def index():
 @router.route('/graph')
 def graphic_show():
     return render_template('graphic_form.html')
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def ensure_image_folder_exists():
+    os.makedirs(IMAGE_FOLDER, exist_ok=True)
+
+
+@router.route('/upload-images', methods=['POST'])
+def upload_images():
+    ensure_image_folder_exists()
+
+    if 'images' not in request.files:
+        return jsonify({'error': 'No files uploaded'}), 400
+
+    files = request.files.getlist('images')
+    step_index = request.form.get('step_index')
+
+    filenames = []
+    for file in files:
+        if file.filename == '':
+            continue
+
+        if file and allowed_file(file.filename):
+            # Генерируем уникальное имя файла
+            ext = file.filename.rsplit('.', 1)[1].lower()
+            filename = f"{uuid.uuid4().hex}.{ext}"
+            filepath = os.path.join(IMAGE_FOLDER, filename)
+
+            try:
+                file.save(filepath)
+                filenames.append(filename)
+            except Exception as e:
+                current_app.logger.error(f"Error saving file: {str(e)}")
+                continue
+
+    return jsonify({'filenames': filenames})
+
+
+@router.route('/delete-image', methods=['POST'])
+def delete_image():
+    data = request.get_json()
+    filename = data.get('filename')
+
+    if not filename:
+        return jsonify({'error': 'Filename required'}), 400
+
+    try:
+        filepath = os.path.join(IMAGE_FOLDER, filename)
+        if os.path.exists(filepath):
+            os.remove(filepath)
+            return jsonify({'success': True})
+        return jsonify({'error': 'File not found'}), 404
+    except Exception as e:
+        current_app.logger.error(f"Error deleting file: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 
 
 @router.route('/get-ingredient-form')
@@ -87,32 +155,43 @@ def run_async(coro):  # функция для асинхронного запу�
 @router.route('/create', methods=['POST', 'GET'])
 async def create_recipe():
     form = RecipeForm()
-    if request.method == 'GET':
-        while form.ingredients:
-            form.ingredients.pop_entry()
-        while form.steps:
-            form.steps.pop_entry()
-        while form.links:
-            form.links.pop_entry()
 
-        form.ingredients.append_entry()
-        step = form.steps.append_entry()
-        # Добавляем только одну ссылку по умолчанию
-        step.links.append_entry()
-        form.links.append_entry()
+    if request.method == 'GET':
+        form = RecipeForm()
+        # Добавляем начальные записи с пустыми данными
+        if len(form.ingredients) == 0:
+            ingredient = form.ingredients.append_entry()
+            ingredient.form.name.data = ""
+            ingredient.form.number.data = 1
+            ingredient.form.quantity.data = 1
+
+        if len(form.steps) == 0:
+            step = form.steps.append_entry()
+            step.form.name.data = ""
+            step.form.description.data = ""
+            step.form.number.data = 1
+
+        if len(form.links) == 0:
+            form.links.append_entry()
 
         return render_template('create_recipe_form.html', form=form)
 
     if request.method == 'POST':
-        form = RecipeForm(request.form)
-        if not form.validate():
-            return render_template('create_recipe_form.html', form=form, error="Проверьте заполнение полей")
-
         try:
-            current_user = run_async(get_user_by_token())
+            # Получаем данные формы
+            form_data = request.form.to_dict()
+
+            # Обрабатываем изображения
+            images_data = {}
+            for key, value in form_data.items():
+                if key.endswith('-image-filenames') and value:
+                    step_index = key.split('-')[1]
+                    images_data[f'steps-{step_index}-images'] = json.loads(value)
+
+            # Собираем данные рецепта
             recipe_data = {
                 'name': form.name.data,
-                'user_id': current_user.id,
+                'user_id': 0,  # Замените на реальный ID пользователя
                 'content': {
                     'theme': form.theme.data,
                     'description': form.description.data,
@@ -120,34 +199,48 @@ async def create_recipe():
                     'categories': form.categories.data,
                     'ingredients': [
                         {
-                            'number': ingredient.number.data,
-                            'name': ingredient.name.data,
-                            'for_what': ingredient.for_what.data or '',  # Пустая строка вместо None
-                            'quantity': ingredient.quantity.data
+                            'number': ingredient.form.number.data,
+                            'name': ingredient.form.name.data,
+                            'for_what': ingredient.form.for_what.data or '',
+                            'quantity': ingredient.form.quantity.data
                         } for ingredient in form.ingredients
                     ],
                     'steps': [
                         {
-                            'number': step.number.data,
-                            'name': step.name.data,
-                            'description': step.description.data,
-                            'explanations': step.explanations.data,
+                            'number': step.form.number.data,
+                            'name': step.form.name.data,
+                            'description': step.form.description.data,
+                            'explanations': step.form.explanations.data,
+                            'images': images_data.get(f'steps-{i}-images', []),
                             'links': [
                                 {
-                                    'link_description': link.link_description.data,
-                                    'link': link.link.data
+                                    'link_description': link.form.link_description.data,
+                                    'link': link.form.link.data
                                 } for link in step.links
                             ]
-                        } for step in form.steps
+                        } for i, step in enumerate(form.steps)
                     ],
                     'result': form.result.data,
                     'use_ai_image': form.use_ai_image.data,
                     'use_ai_text': form.use_ai_text.data
                 }
             }
-            future = current_app.executor.submit(run_async, RecipeService.add_recipe(**recipe_data))
-            future.result()
-            return redirect(url_for('recipe.index'))
+
+            recipe_id = await RecipeService.add_recipe(**{
+                'user_id': 0,
+                'name': recipe_data['name'],
+                'content': recipe_data
+            })
+
+            return jsonify({
+                'success': True,
+                'message': 'Рецепт успешно создан',
+                'redirect': url_for('form.graphic_show')
+            })
+
         except Exception as e:
-            print(f"Ошибка создания рецепта: {e}")
-            return render_template('create_recipe_form.html', form=form, error=str(e))
+            current_app.logger.error(f'Error: {str(e)}', exc_info=True)
+            return jsonify({
+                'success': False,
+                'message': 'Внутренняя ошибка сервера'
+            }), 500

@@ -51,15 +51,34 @@
                 <div class="grid_textarea_custom_label">
                     <div class="label--bg_color border_top">наименование</div>
                     {{ form.name(class="input_name border_top no-resize textarea_form", required="required") }}
+                    {% if form.name.errors %}
+                        <div class="error-message">{{ form.name.errors[0] }}</div>
+                    {% endif %}
+
                     <div class="border_bottom label--bg_color">тема</div>
                     {{ form.theme(class="input_theme border_bottom no-resize textarea_form", required="required") }}
+                    {% if form.theme.errors %}
+                        <div class="error-message">{{ form.theme.errors[0] }}</div>
+                    {% endif %}
+
                     <div class="border_top label--bg_color">описание</div>
                     {{ form.description(class="input_description border_top no-resize textarea_form", required="required") }}
+                    {% if form.description.errors %}
+                        <div class="error-message">{{ form.description.errors[0] }}</div>
+                    {% endif %}
+
                     <div class="border_bottom label--bg_color">хэштеги</div>
                     {{ form.hashtags(class="input_hashtags border_bottom no-resize textarea_form") }}
+                    {% if form.hashtags.errors %}
+                        <div class="error-message">{{ form.hashtags.errors[0] }}</div>
+                    {% endif %}
                 </div>
+
                 <label class="select_category border_top" type="header">выберите категорию рецепта</label>
                 {{ form.categories(class="d-none select_category select_category_option border_bottom") }}
+                {% if form.categories.errors %}
+                    <div class="error-message">{{ form.categories.errors[0] }}</div>
+                {% endif %}
 
                 <!-- Ингредиенты -->
                 <div class="ingredients block--flex_column">
@@ -69,14 +88,27 @@
                             <div class="ingredient block--flex_row">
                                 {{ ingredient.hidden_tag() }}
                                 <label class="id_ing">{{ loop.index }}</label>
-                                <input type="number" name="{{ ingredient.number.name }}" class="style_font"
-                                       placeholder="номер" value="{{ ingredient.number.data }}">
-                                <input type="text" name="{{ ingredient.name.name }}" class="style_font"
-                                       placeholder="наименование" value="{{ ingredient.name.data }}">
-                                <input type="text" name="{{ ingredient.for_what.name }}" class="style_font"
-                                       placeholder="для чего" value="{{ ingredient.for_what.data }}">
-                                <input type="number" name="{{ ingredient.quantity.name }}" class="style_font"
-                                       placeholder="кол-во" value="{{ ingredient.quantity.data }}">
+                                <input type="number" name="ingredients-{{ loop.index0 }}-number" class="style_font"
+                                       placeholder="номер" value="{{ ingredient.number.data or 1 }}" required>
+                                {% if ingredient.number.errors %}
+                                    <div class="error-message">{{ ingredient.number.errors[0] }}</div>
+                                {% endif %}
+
+                                <input type="text" name="ingredients-{{ loop.index0 }}-name" class="style_font"
+                                       placeholder="наименование" value="{{ ingredient.name.data or '' }}" required>
+                                {% if ingredient.name.errors %}
+                                    <div class="error-message">{{ ingredient.name.errors[0] }}</div>
+                                {% endif %}
+
+                                <input type="text" name="ingredients-{{ loop.index0 }}-for_what" class="style_font"
+                                       placeholder="для чего" value="{{ ingredient.for_what.data or '' }}">
+
+                                <input type="number" name="ingredients-{{ loop.index0 }}-quantity" class="style_font"
+                                       placeholder="кол-во" value="{{ ingredient.quantity.data or 1 }}" required>
+                                {% if ingredient.quantity.errors %}
+                                    <div class="error-message">{{ ingredient.quantity.errors[0] }}</div>
+                                {% endif %}
+
                                 <label class="label__button--delete_ing">x</label>
                             </div>
                         {% endfor %}
@@ -84,14 +116,13 @@
                     <button class="plus_ing border_bottom" type="button" id="add_ingredient">+</button>
                 </div>
 
-
                 <!-- Шаги -->
                 <div class="steps border_top border_bottom">
                     <div class="header__text border_top">
                         <h2 class="header_2">Этапы</h2>
                     </div>
                     <div class="block--flex_column" id="cont_steps">
-                        <div class="steps-container">  <!-- Новый контейнер для шагов -->
+                        <div class="steps-container">
                             {% for step in form.steps %}
                                 <div class="steps__elem" data-step-index="{{ loop.index0 }}">
                                     {{ step.hidden_tag() }}
@@ -100,28 +131,40 @@
                                             <div class="grid_input_custom_label var_grid_1">
                                                 <div class="label_back border_bottom_right_top_left">имя</div>
                                                 <input type="text"
-                                                       name="{{ step.name.name }}"
+                                                       name="steps-{{ loop.index0 }}-name"
                                                        class="border_bottom style_font limit_width_input"
-                                                       value="{{ step.name.data or '' }}">
+                                                       value="{{ step.name.data or '' }}" required>
+                                                {% if step.name.errors %}
+                                                    <div class="error-message">{{ step.name.errors[0] }}</div>
+                                                {% endif %}
+
                                                 <div class="border_bottom label_back">номер</div>
-                                                <input type="text"
-                                                       name="{{ step.number.name }}"
+                                                <input type="number"
+                                                       name="steps-{{ loop.index0 }}-number"
                                                        class="style_font border_top_right_bottom_left limit_width_input"
-                                                       value="{{ step.number.data or '' }}">
+                                                       value="{{ step.number.data or 1 }}" required>
+                                                {% if step.number.errors %}
+                                                    <div class="error-message">{{ step.number.errors[0] }}</div>
+                                                {% endif %}
                                             </div>
                                             <div class="grid_input_custom_label var_grid_2">
                                                 <div class="label_back border_right">описание</div>
-                                                <textarea name="{{ step.description.name }}"
+                                                <textarea name="steps-{{ loop.index0 }}-description"
                                                           class="style_font border_left"
-                                                          style="resize: none; border: none">{{ step.description.data or '' }}</textarea>
+                                                          style="resize: none; border: none"
+                                                          required>{{ step.description.data or '' }}</textarea>
+                                                {% if step.description.errors %}
+                                                    <div class="error-message">{{ step.description.errors[0] }}</div>
+                                                {% endif %}
+
                                                 <div class="label_back border_top_right_bottom_left">пояснение</div>
-                                                <textarea name="{{ step.explanations.name }}"
+                                                <textarea name="steps-{{ loop.index0 }}-explanations"
                                                           class="style_font border_bottom_right_top_left"
                                                           style="resize: none; border: none">{{ step.explanations.data or '' }}</textarea>
                                             </div>
-                                            <div class="step--add_graphic border_top border_bottom">
+                                            <div class="step--add_graphic border_top border_bottom" style="text-align: center">
                                                 <div class="border_bottom border_top container">
-                                                    выберите графическую составляющую этапа
+                                                    выберите графическую составляющую этапа, где одна картинка не превышает 16мб
                                                     <div id="container_graph-{{ loop.index0 }}"
                                                          class="images-container"></div>
                                                 </div>
@@ -135,15 +178,22 @@
                                                     {% for link in step.links %}
                                                         <div class="link">
                                                             {{ link.hidden_tag() }}
-                                                            {{ link.link_description(placeholder="куда ведет", class="where border_bottom border_top") }}
-                                                            {{ link.link(placeholder="ссылка", class="link_str border_bottom border_top") }}
+                                                            <input type="text"
+                                                                   name="steps-{{ loop.index0 }}-links-{{ loop.index0 }}-link_description"
+                                                                   placeholder="куда ведет"
+                                                                   class="where border_bottom border_top"
+                                                                   value="{{ link.link_description.data or '' }}">
+                                                            <input type="text"
+                                                                   name="steps-{{ loop.index0 }}-links-{{ loop.index0 }}-link"
+                                                                   placeholder="ссылка"
+                                                                   class="link_str border_bottom border_top"
+                                                                   value="{{ link.link.data or '' }}">
                                                             <label class="label__button--delete_link">x</label>
                                                         </div>
                                                     {% endfor %}
                                                 </div>
                                                 <div class="between_link_and_add border_bottom border_top">нажмите +,
-                                                    чтобы
-                                                    добавить ссылку
+                                                    чтобы добавить ссылку
                                                 </div>
                                                 <button class="add--step_link__button border_bottom" type="button"
                                                         data-step-index="{{ loop.index0 }}">+
@@ -158,11 +208,15 @@
                         <button class="add-button border_bottom" type="button" id="add_step">+</button>
                     </div>
                 </div>
+
                 <!-- Результат -->
                 <div class="result">
                     <div class="grid_result">
                         <h2 class="header_2">Результат</h2>
                         {{ form.result(placeholder="напишите о том, что должно получится", class="result_textarea") }}
+                        {% if form.result.errors %}
+                            <div class="error-message">{{ form.result.errors[0] }}</div>
+                        {% endif %}
                     </div>
                 </div>
 
@@ -172,8 +226,16 @@
                         {% for link in form.links %}
                             <div class="link">
                                 {{ link.hidden_tag() }}
-                                {{ link.link_description(placeholder="куда ведет", class="where border_bottom border_top") }}
-                                {{ link.link(placeholder="ссылка", class="link_str border_bottom border_top") }}
+                                <input type="text"
+                                       name="links-{{ loop.index0 }}-link_description"
+                                       placeholder="куда ведет"
+                                       class="where border_bottom border_top"
+                                       value="{{ link.link_description.data or '' }}">
+                                <input type="text"
+                                       name="links-{{ loop.index0 }}-link"
+                                       placeholder="ссылка"
+                                       class="link_str border_bottom border_top"
+                                       value="{{ link.link.data or '' }}">
                                 <label class="label__button--delete_link">x</label>
                             </div>
                         {% endfor %}
@@ -186,7 +248,7 @@
 
                 <div class="block--flex_row agree">
                     {{ form.use_ai_image(class="checkbox") }}
-                    <label for="use_ai_image">использовать нейросети для генерации фото</label>
+                    <label for="use_ai_image">использовать нейросети для генерации фото (Необязательно)</label>
                 </div>
                 <div class="block--flex_row agree">
                     {{ form.use_ai_text(class="checkbox") }}
@@ -207,6 +269,16 @@
                         {% endfor %}
                     </div>
                 {% endif %}
+                <div id="loading-wave" class="loading-wave" style="display: none;">
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                </div>
+                <div id="form-errors" class="form-errors" style="display: none;">
+                    <h3>Ошибки в форме:</h3>
+                    <ul id="error-list"></ul>
+                </div>
             </form>
         </div>
     </div>
@@ -237,6 +309,9 @@
             }
         });
         document.addEventListener('DOMContentLoaded', (e) => {
+            document.querySelector('.button--scroll-up').addEventListener('click', () => {
+                document.getElementById('back').scrollTo({top: 0, behavior: 'smooth'})
+            })
             observer.observe(document.getElementById('back'));
             AddInForm.init();
         })

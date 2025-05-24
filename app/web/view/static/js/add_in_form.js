@@ -61,18 +61,32 @@ export class AddInForm {
         fileInput.type = 'file';
         fileInput.accept = 'image/*';
         fileInput.multiple = true;
+        fileInput.name = `steps-${stepIndex}-images`; // Важно для FormData
 
-        fileInput.addEventListener('change', (e) => {
+        fileInput.addEventListener('change', async (e) => {
             const files = Array.from(e.target.files);
             const container = document.getElementById(`container_graph-${stepIndex}`);
 
             if (!container) return;
 
-            files.forEach(file => {
+            // Создаем скрытый input для хранения файлов
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = `steps-${stepIndex}-image-filenames`;
+            hiddenInput.className = 'image-filenames';
+            container.appendChild(hiddenInput);
+
+            // Предзагрузка файлов на сервер
+            const filenames = await this.uploadImages(files, stepIndex);
+            hiddenInput.value = JSON.stringify(filenames);
+
+            // Показываем превью
+            files.forEach((file, index) => {
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     const imageDiv = document.createElement('div');
                     imageDiv.className = 'image-item';
+                    imageDiv.dataset.filename = filenames[index];
 
                     const img = document.createElement('img');
                     img.src = event.target.result;
@@ -82,7 +96,10 @@ export class AddInForm {
                     const deleteBtn = document.createElement('button');
                     deleteBtn.textContent = '×';
                     deleteBtn.className = 'delete-image-button';
-                    deleteBtn.addEventListener('click', () => imageDiv.remove());
+                    deleteBtn.addEventListener('click', async () => {
+                        await this.deleteImage(filenames[index]);
+                        imageDiv.remove();
+                    });
 
                     imageDiv.appendChild(img);
                     imageDiv.appendChild(deleteBtn);
@@ -93,6 +110,49 @@ export class AddInForm {
         });
 
         fileInput.click();
+    }
+
+    static async uploadImages(files, stepIndex) {
+        const formData = new FormData();
+        files.forEach(file => {
+            formData.append('images', file);
+        });
+        formData.append('step_index', stepIndex);
+
+        try {
+            const response = await fetch('/form/upload-images', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('input[name="csrf_token"]')?.value || '',
+                }
+            });
+            const result = await response.json();
+            if (response.ok) {
+                return result.filenames;
+            } else {
+                console.error('Upload error:', result.error);
+                return [];
+            }
+        } catch (error) {
+            console.error('Upload failed:', error);
+            return [];
+        }
+    }
+
+    static async deleteImage(filename) {
+        try {
+            await fetch('/form/delete-image', {
+                method: 'POST',
+                body: JSON.stringify({filename}),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('input[name="csrf_token"]')?.value || '',
+                }
+            });
+        } catch (error) {
+            console.error('Delete failed:', error);
+        }
     }
 
     static async addStep(container, index) {
@@ -312,28 +372,184 @@ export class AddInForm {
     }
 
     static initFormSubmit() {
-        document.querySelector('form')?.addEventListener('submit', function (e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            const csrfToken = document.querySelector('input[name="csrf_token"]').value;
-            formData.append('csrf_token', csrfToken);
+        const form = document.querySelector('form');
+        if (!form) return;
 
-            fetch(this.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRFToken': csrfToken
-                }
-            }).then(response => {
-                if (response.redirected) {
-                    window.location.href = response.url;
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            // Очистка предыдущих ошибок
+            this.clearFormErrors();
+            const requiredFields = form.querySelectorAll('[required]');
+            let isValid = true;
+
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.classList.add('error-field');
+                    isValid = false;
                 } else {
-                    return response.json();
+                    field.classList.remove('error-field');
                 }
-            }).catch(error => {
-                console.error('Error:', error);
             });
+
+            if (!isValid) {
+                this.showFormErrors({
+                    'form_error': ['Пожалуйста, заполните все обязательные поля']
+                });
+                return;
+            }
+
+            const submitButton = form.querySelector('button[type="submit"]');
+            const loadingWave = document.getElementById('loading-wave');
+
+            try {
+                // Показать загрузку
+                if (submitButton) submitButton.disabled = true;
+                if (loadingWave) loadingWave.style.display = 'flex';
+
+                const formData = new FormData(form);
+                console.log(Array.from(formData.keys()));
+                console.log(Array.from(formData.values()));
+                for (let element of formData) {
+                    console.log(element)
+                }
+
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': document.querySelector('input[name="csrf_token"]')?.value || '',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    if (result.errors) {
+                        this.showFormErrors(result.errors);
+                    } else {
+                        throw new Error(result.message || 'Ошибка сервера');
+                    }
+                    return;
+                }
+
+                // Успешная отправка
+                if (result.redirect) {
+                    window.location.href = result.redirect;
+                }
+
+            } catch (error) {
+                console.error('Ошибка:', error);
+                this.showFormErrors({
+                    'form_error': [error.message || 'Ошибка при отправке формы']
+                });
+            } finally {
+                if (submitButton) submitButton.disabled = false;
+                if (loadingWave) loadingWave.style.display = 'none';
+            }
+        }.bind(this));
+    }
+
+    static clearFormErrors() {
+        const errorContainer = document.getElementById('form-errors');
+        const errorList = document.getElementById('error-list');
+
+        if (errorContainer) errorContainer.style.display = 'none';
+        if (errorList) errorList.innerHTML = '';
+
+        document.querySelectorAll('.error-field').forEach(el => {
+            el.classList.remove('error-field');
         });
+
+        document.querySelectorAll('.error-message').forEach(el => {
+            el.remove();
+        });
+    }
+
+
+    static showFormErrors(errors) {
+        const errorContainer = document.getElementById('form-errors');
+        const errorList = document.getElementById('error-list');
+
+        if (!errorContainer || !errorList) {
+            console.error('Контейнеры ошибок не найдены');
+            return;
+        }
+
+        this.clearFormErrors();
+
+        errorContainer.style.display = 'block';
+        errorList.innerHTML = '';
+
+        // Сначала показываем общие ошибки формы
+        if (errors.form_error) {
+            errors.form_error.forEach(error => {
+                const li = document.createElement('li');
+                li.textContent = error;
+                errorList.appendChild(li);
+            });
+        }
+
+        // Затем показываем ошибки полей
+        for (const fieldName in errors) {
+            if (fieldName === 'form_error') continue;
+
+            const fieldErrors = errors[fieldName];
+            const field = this.findFormField(fieldName);
+
+            if (field) {
+                field.classList.add('error-field');
+
+                // Создаем элемент с ошибкой
+                const errorElement = document.createElement('div');
+                errorElement.className = 'error-message';
+                errorElement.textContent = fieldErrors.join(', ');
+
+                // Добавляем после поля
+                field.parentNode.appendChild(errorElement);
+            }
+        }
+
+        errorContainer.scrollIntoView({behavior: 'smooth'});
+    }
+
+    static getFieldLabel(fieldName) {
+        // Маппинг технических имен полей на человекочитаемые
+        const labels = {
+            'name': 'Название',
+            'theme': 'Тема',
+            'description': 'Описание',
+            'hashtags': 'Хэштеги',
+            'ingredients': 'Ингредиенты',
+            'steps': 'Шаги',
+            'result': 'Результат',
+            'form_error': 'Ошибка формы'
+        };
+
+        return labels[fieldName] || fieldName;
+    }
+
+    static findFormField(fieldName) {
+        // Ищем поле по точному совпадению имени
+        let field = document.querySelector(`[name="${fieldName}"]`);
+
+        // Если не нашли, пробуем найти по частичному совпадению (для динамически добавленных полей)
+        if (!field) {
+            const parts = fieldName.split('-');
+            if (parts[0] === 'ingredients') {
+                const index = parts[1];
+                const fieldName = parts[2];
+                field = document.querySelector(`[name="ingredients-${index}-${fieldName}"]`);
+            } else if (parts[0] === 'steps') {
+                const index = parts[1];
+                const fieldName = parts[2];
+                field = document.querySelector(`[name="steps-${index}-${fieldName}"]`);
+            }
+        }
+
+        return field;
     }
 
     static async init() {
@@ -345,14 +561,14 @@ export class AddInForm {
         this.initFormSubmit();
 
         document.addEventListener('click', async (e) => {
-        if (e.target.classList.contains('add--step_link__button')) {
-            const stepElement = e.target.closest('.steps__elem');
-            if (stepElement) {
-                const stepIndex = this.getStepIndex(stepElement);
-                const linkCount = stepElement.querySelectorAll('.link').length;
-                await this.addStepLink(stepIndex, linkCount);
+            if (e.target.classList.contains('add--step_link__button')) {
+                const stepElement = e.target.closest('.steps__elem');
+                if (stepElement) {
+                    const stepIndex = this.getStepIndex(stepElement);
+                    const linkCount = stepElement.querySelectorAll('.link').length;
+                    await this.addStepLink(stepIndex, linkCount);
+                }
             }
-        }
-    });
+        });
     }
 }
